@@ -1,0 +1,11 @@
+{
+  "name": "timevault-watches",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Watch selling website hosted on Firebase",
+  "scripts": {
+    "start": "npx --yes serve public -l 5000",
+    "generate": "node scripts/generate-products.js",
+    "deploy": "npx --yes firebase-tools deploy --only hosting"
+  }
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TimeVault – Buy Watches Online | Men, Women, Smart & Luxury Watches</title>
+  <meta name="description" content="Shop 120+ watches online – men's, women's, smartwatches, chronographs, luxury, sports and kids watches from ₹100 to ₹20,000. Cash on delivery, easy returns.">
+  <meta name="theme-color" content="#0f1b2d">
+  <meta property="og:title" content="TimeVault – Premium Watches Online">
+  <meta property="og:description" content="120+ watches from ₹100 to ₹20,000. Free shipping above ₹999, COD available.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="topbar">🚚 Free shipping on orders above ₹999 &nbsp;·&nbsp; 💵 Cash on Delivery available &nbsp;·&nbsp; 🔁 7-day easy returns</div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+      <a href="#/" class="logo"><span class="logo-mark">⌚</span><span id="storeName">TimeVault</span></a>
+      <form class="search" id="searchForm" role="search">
+        <input id="searchInput" type="search" placeholder="Search watches, brands, colours…" aria-label="Search watches">
+        <button type="submit" aria-label="Search">🔍</button>
+      </form>
+      <nav class="header-actions">
+        <a href="#/wishlist" class="icon-btn" aria-label="Wishlist">♡<span class="count" id="wishCount">0</span></a>
+        <a href="#/cart" class="icon-btn" aria-label="Cart">🛒<span class="count" id="cartCount">0</span></a>
+      </nav>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="container nav-inner" id="navLinks"></div>
+    </nav>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+
+  <footer class="footer">
+    <div class="container">
+      <div data-ad="728x90" class="ad-slot"></div>
+      <div class="footer-grid">
+        <div>
+          <a href="#/" class="logo logo-light"><span class="logo-mark">⌚</span><span class="js-store-name">TimeVault</span></a>
+          <p class="muted-light" id="footerTagline"></p>
+          <p class="muted-light" id="footerContact"></p>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <ul id="footerCats"></ul>
+        </div>
+        <div>
+          <h4>Help</h4>
+          <ul>
+            <li><a href="#/contact">Contact Us</a></li>
+            <li><a href="#/page/shipping">Shipping Policy</a></li>
+            <li><a href="#/page/returns">Returns &amp; Refunds</a></li>
+            <li><a href="#/page/warranty">Warranty</a></li>
+            <li><a href="#/page/faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#/about">About Us</a></li>
+            <li><a href="#/page/privacy">Privacy Policy</a></li>
+            <li><a href="#/page/terms">Terms &amp; Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">© <span id="year"></span> <span class="js-store-name">TimeVault</span>. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">💬</a>
+
+  <script src="js/config.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/watch-art.js"></script>
+  <script src="js/ads.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
