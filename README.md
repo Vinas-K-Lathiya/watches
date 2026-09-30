@@ -24,16 +24,16 @@ npm install -g firebase-tools
 firebase login
 
 # 2. Create a new Firebase project (the ID must be unique worldwide, lowercase)
-firebase projects:create timevault-watches-123 --display-name "TimeVault Watches"
+firebase projects:create timevault-watches-2026 --display-name "TimeVault Watches"
 
 # 3. Point this folder at that project
-firebase use --add timevault-watches-123
+firebase use --add timevault-watches-2026
 
 # 4. Deploy
 firebase deploy --only hosting
 ```
 
-Your site will be live at `https://timevault-watches-123.web.app`. You can connect your own domain in Firebase Console → Hosting → *Add custom domain*.
+Your site will be live at `https://timevault-watches-2026.web.app`. You can connect your own domain in Firebase Console → Hosting → *Add custom domain*.
 
 (You can also create the project in the browser at https://console.firebase.google.com → *Add project*, then run steps 3–4.)
 
