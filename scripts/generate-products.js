@@ -16,6 +16,7 @@ const CATEGORIES = [
   { id: 'sports', name: 'G-Shock & Sports' },
   { id: 'chrono', name: 'Chronographs' },
   { id: 'premium', name: 'Premium Collection' },
+  { id: 'luxury', name: 'Luxury Swiss' },
   { id: 'kids', name: 'Kids Watches' },
 ];
 
@@ -38,17 +39,17 @@ const STRAP_LINE = {
   fabric: 'The rugged canvas strap is light and breathable.',
   nato: 'The slip-through nylon strap is light, comfy and quick to swap.',
 };
-const WARRANTY = { Casio: '2 Years', Titan: '2 Years', Fastrack: '1 Year', Sonata: '1 Year', Timex: '1 Year', Fossil: '2 Years', Seiko: '1 Year', Citizen: '1 Year', HMT: '1 Year', TimeVault: '6 Months' };
+const WARRANTY = { Rolex: '5 Years', Omega: '5 Years', 'TAG Heuer': '2 Years', Tissot: '2 Years', Apple: '1 Year', Casio: '2 Years', Titan: '2 Years', Fastrack: '1 Year', Sonata: '1 Year', Timex: '1 Year', Fossil: '2 Years', Seiko: '1 Year', Citizen: '1 Year', HMT: '1 Year', TimeVault: '6 Months' };
 
 const products = CATALOG.map((c, i) => {
   const n = i + 1;
   const colorNames = c.v.map((v) => v.name);
   const colourText = colorNames.length > 1 ? `Available in ${colorNames.slice(0, -1).join(', ')} and ${colorNames[colorNames.length - 1]}.` : '';
   const closer = pick([
-    'Comes in a gift box with warranty card - perfect for birthdays, anniversaries and festivals.',
-    '100% genuine product with brand warranty and easy returns.',
+    'A popular gift for birthdays, anniversaries and festivals.',
+    'Check the official brand website or authorised dealers for the latest price.',
     'A great gift for yourself or someone special.',
-    'Ships in original packaging with warranty card.',
+    'One of the most searched watches in India.',
   ]);
   const pop = c.pop || 6;
   const reviews = Math.round(pop * pop * (8 + rand() * 18));
@@ -65,13 +66,13 @@ const products = CATALOG.map((c, i) => {
     rating: Math.min(4.9, Math.round((3.9 + pop * 0.09 + rand() * 0.15) * 10) / 10),
     reviews,
     pop,
-    stock: pop >= 9 ? 20 + Math.floor(rand() * 40) : rand() < 0.07 ? 0 : 3 + Math.floor(rand() * 30),
-    badge: pop >= 10 ? 'Bestseller' : c.p >= 12000 ? 'Premium' : 1 - c.p / c.mrp >= 0.5 ? 'Hot Deal' : pop >= 9 ? 'Top Rated' : '',
+        badge: c.lux ? 'Luxury' : pop >= 10 ? 'Bestseller' : 1 - c.p / c.mrp >= 0.5 ? 'Big Discount' : pop >= 9 ? 'Top Rated' : '',
     style: c.s,
     strapType: c.st,
     small: !!c.small,
     look: {
       ind: c.ind || 'stick', date: !!c.date, tachy: !!c.tachy, auto: !!c.auto, openheart: !!c.openheart, bezel2: !!c.bezel2,
+      fluted: !!c.fluted, gmt: !!c.gmt, day: !!c.day, cyclops: !!(c.lux && c.date),
       labels: c.labels || null,
     },
     colors: c.v.map((v) => ({ ...v, image: '' })),
@@ -87,7 +88,7 @@ const products = CATALOG.map((c, i) => {
       Glass: c.glass,
       'Water Resistance': c.wr,
       Warranty: WARRANTY[c.b] || '1 Year',
-      'In the Box': 'Watch, box, warranty card' + (/Smart|Band/.test(c.mv) ? ', magnetic charger' : ''),
+      'Price in India': c.p === c.mrp ? `₹${c.p.toLocaleString('en-IN')} (approx. retail)` : `₹${c.p.toLocaleString('en-IN')} (MRP ₹${c.mrp.toLocaleString('en-IN')})`,
     },
     createdAt: `2026-${String(1 + Math.floor(rand() * 9)).padStart(2, '0')}-${String(1 + Math.floor(rand() * 28)).padStart(2, '0')}`,
   };

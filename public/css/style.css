@@ -291,3 +291,12 @@ button, input, select, textarea { font: inherit; }
   .footer-grid { grid-template-columns: 1fr; }
   .hero-trust { gap: 10px; }
 }
+
+/* catalogue additions */
+.badge-lux { background: linear-gradient(135deg, var(--gold), var(--gold-2)); color: #1d1405; }
+.quick-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
+.quick-specs div { background: var(--card); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
+.quick-specs span { display: block; font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.quick-specs strong { font-size: .92rem; }
+.wish-toggle.active { color: #e0245e; border-color: #e0245e; }
+.pdp-info .btn-wa { margin-top: 0; }

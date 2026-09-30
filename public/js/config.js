@@ -3,21 +3,12 @@
  * ============================================================ */
 window.STORE_CONFIG = {
   name: 'TimeVault',
-  tagline: 'Premium watches for every wrist',
+  tagline: 'Watch prices in India – Rolex to Casio',
   currency: '₹',
   locale: 'en-IN',
 
-  // Orders are sent to this WhatsApp number (country code + number, digits only).
-  whatsapp: '919999999999',
-  phone: '+91 99999 99999',
+  // Shown on the Contact page.
   email: 'support@timevault.store',
-  address: 'Surat, Gujarat, India',
-  instagram: '',   // e.g. 'https://instagram.com/yourshop'
-  facebook: '',
-
-  shippingFee: 49,
-  freeShippingAbove: 999,
-  codAvailable: true,
 
   /* ----------------------------------------------------------
    *  ADSTERRA ADS

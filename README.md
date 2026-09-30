@@ -1,15 +1,17 @@
-# TimeVault – Watch Selling Website
+# TimeVault – Watch Prices in India
 
-A complete online watch store: 106 top-selling watch models (Casio G-Shock, Titan, Fastrack, Fossil, Timex, Seiko, Noise, boAt, Fire-Boltt and more, ₹129 – ₹20,000) in 7 categories, several colours per watch, search, filters, cart, wishlist, checkout (orders go to your WhatsApp, with COD) and Adsterra ad slots. It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**.
+A watch catalogue and price guide that earns money from **Adsterra ads**. It lists 122 popular watches with prices in India, specs and 336 colour variants, from Casio and Titan to Apple Watch, Rolex, Omega and TAG Heuer. There is no cart or checkout; visitors browse, compare, save and share. It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**.
+
+Prices were last updated in September 2026. Luxury prices are official Indian retail prices where available; the rest are typical market prices. Update them in `scripts/catalog.js` and run `npm run generate`.
 
 ## Folder layout
 
 | Path | What it is |
 |---|---|
-| `public/js/config.js` | **Store settings**: shop name, WhatsApp number, phone, email, shipping fee, **Adsterra keys** |
+| `public/js/config.js` | **Site settings**: site name, contact email, **Adsterra keys** |
 | `public/js/products.js` | **All watches**: name, price, MRP, colours, description, specs, stock |
 | `public/images/` | Put your real watch photos here |
-| `public/js/app.js` | Pages: home, shop, product, cart, checkout, wishlist, policies |
+| `public/js/app.js` | Pages: home, watch list with filters, watch details, saved watches, disclaimer/privacy/terms |
 | `public/js/ads.js` | Adsterra ad loader |
 | `public/js/watch-art.js` | Draws a watch picture when a colour has no photo yet |
 | `scripts/catalog.js` | The starter catalogue (models, prices, colours, specs) |
@@ -52,8 +54,7 @@ To publish changes later, just run `firebase deploy --only hosting` again.
 Edit `public/js/config.js`:
 
 - `name`, `tagline`: your shop name
-- `whatsapp`: your number with country code, digits only (e.g. `919876543210`). **Orders are sent here.**
-- `phone`, `email`, `address`, `shippingFee`, `freeShippingAbove`
+- `email`: shown on the Contact page
 
 ## 3. Add Adsterra ads
 
@@ -65,7 +66,7 @@ Edit `public/js/config.js`:
    - Social Bar / Popunder: copy the script `src`.
 4. Deploy again.
 
-Ad slots are on the home page, shop (top, inside the product grid, sidebar), product page, cart, checkout confirmation, static pages and the footer. Mobile screens automatically get the smaller banner sizes. To see where ads will appear before you have keys, open the site with `?adpreview` at the end of the URL (e.g. `https://yoursite.web.app/?adpreview`).
+Ad slots are on the home page (several), the watch list (top, inside the grid every 8 watches, sidebar, bottom), every watch page (3 slots), the static pages and the footer. Mobile screens automatically get the smaller banner sizes. To see where ads will appear before you have keys, open the site with `?adpreview` at the end of the URL (e.g. `https://yoursite.web.app/?adpreview`).
 
 ## 4. Add or edit watches
 

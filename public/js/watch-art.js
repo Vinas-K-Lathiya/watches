@@ -186,13 +186,14 @@
     }
     return s;
   }
-  function indices(id, kind, r, dial, accent, gold) {
+  function indices(id, kind, r, dial, accent, gold, skip12) {
     const light = isLight(dial);
     const ink = light ? '#1d1d1f' : '#f2f2f2';
     const applied = gold ? `url(#hg${id})` : light ? `url(#hd${id})` : `url(#hl${id})`;
     let s = '';
     const roman = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
     for (let i = 0; i < 12; i++) {
+      if (skip12 && i === 0) continue;
       const deg = i * 30;
       const [x, y] = polar(r - 7, deg);
       if (kind === 'roman') {
@@ -275,16 +276,21 @@
     let dialR = R - 7;
     // bezel variants
     if (p.style === 'diver') {
-      const bz = L.bezel2 ? null : (light ? '#1b1b1b' : shade(dial, -8));
+      const bz = L.bezel2 ? null : v.swatch !== dial && lum(v.swatch) < 150 ? v.swatch : light ? '#1b1b1b' : shade(dial, -8);
       if (L.bezel2) {
         s += `<path d="M${CX} ${CY - R + 3} A${R - 3} ${R - 3} 0 0 1 ${CX} ${CY + R - 3} L${CX} ${CY + R - 15} A${R - 15} ${R - 15} 0 0 0 ${CX} ${CY - R + 15}Z" fill="${accent}"/>`;
-        s += `<path d="M${CX} ${CY + R - 3} A${R - 3} ${R - 3} 0 0 1 ${CX} ${CY - R + 3} L${CX} ${CY - R + 15} A${R - 15} ${R - 15} 0 0 0 ${CX} ${CY + R - 15}Z" fill="${shade(dial, 10)}"/>`;
+        s += `<path d="M${CX} ${CY + R - 3} A${R - 3} ${R - 3} 0 0 1 ${CX} ${CY - R + 3} L${CX} ${CY - R + 15} A${R - 15} ${R - 15} 0 0 0 ${CX} ${CY + R - 15}Z" fill="${L.gmt ? (accent === '#a3161f' ? '#1d3f8f' : '#111111') : shade(dial, 10)}"/>`;
       } else {
         s += `<circle cx="${CX}" cy="${CY}" r="${R - 9}" fill="none" stroke="${bz}" stroke-width="12"/>`;
       }
       s += `<circle cx="${CX}" cy="${CY}" r="${R - 9}" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="12" stroke-dasharray="1 2.2"/>`;
       for (let i = 0; i < 60; i++) {
         const deg = i * 6;
+        if (L.gmt) {
+          if (i % 5 === 0 && i) { const [x, y] = polar(R - 9, deg); s += `<text x="${x}" y="${y + 2.6}" font-size="7" fill="#f4f4f4" text-anchor="middle" font-family="Helvetica,Arial" font-weight="700" transform="rotate(${deg} ${x} ${y})">${(i / 60) * 24 % 2 === 0 ? (i / 60) * 24 : ''}</text>`; }
+          if (i % 5 !== 0 && i % 2 === 0) { const [a, b] = polar(R - 5, deg), [c, d] = polar(R - 8, deg); s += `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="#f4f4f4" stroke-width="1.2"/>`; }
+          continue;
+        }
         if (i % 10 === 0 && i) { const [x, y] = polar(R - 9, deg); s += `<text x="${x}" y="${y + 2.8}" font-size="7.5" fill="#f4f4f4" text-anchor="middle" font-family="Helvetica,Arial" font-weight="700" transform="rotate(${deg} ${x} ${y})">${i}</text>`; continue; }
         if (i === 0) continue;
         if (i < 15 || i % 5 === 0) { const [a, b] = polar(R - 4, deg), [c, d] = polar(R - (i % 5 === 0 ? 11 : 7), deg); s += `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="#f4f4f4" stroke-width="${i % 5 === 0 ? 1.4 : .7}"/>`; }
@@ -301,6 +307,13 @@
       });
       s += text(CX, CY - R + 9.5, 'TACHYMETER', 4.4, light ? '#222' : '#ddd', { ls: 1 });
       dialR = R - 12;
+    } else if (L.fluted) {
+      s += `<circle cx="${CX}" cy="${CY}" r="${R - 5}" fill="none" stroke="url(#mr${id})" stroke-width="9"/>`;
+      for (let i = 0; i < 72; i++) {
+        const [a, b] = polar(R - 1, i * 5), [c, d] = polar(R - 9.5, i * 5);
+        s += `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="${i % 2 ? shade(v.case, 65) : shade(v.case, -45)}" stroke-width="1.7" opacity=".8"/>`;
+      }
+      dialR = R - 10;
     } else {
       s += `<circle cx="${CX}" cy="${CY}" r="${R - 4}" fill="none" stroke="url(#mr${id})" stroke-width="5"/>`;
       dialR = R - 6.5;
@@ -323,8 +336,8 @@
       s += `<g transform="translate(${CX} ${CY}) rotate(-51)"><rect x="-2.6" y="${-(dialR * .55)}" width="5.2" height="${dialR * .55 + 4}" rx="2.6" fill="#333"/></g><g transform="translate(${CX} ${CY}) rotate(58)"><rect x="-2" y="${-(dialR * .8)}" width="4" height="${dialR * .8 + 4}" rx="2" fill="#333"/></g>`;
       s += secHand(200, dialR * 0.85, v.accent) + `<circle cx="${CX}" cy="${CY}" r="3.5" fill="${v.accent}"/>`;
     } else {
-      s += indices(id, L.ind || 'stick', dialR, dial, accent, gold);
-      const topY = CY - dialR * 0.45;
+      s += indices(id, L.ind || 'stick', dialR, dial, accent, gold, L.day);
+      const topY = CY - dialR * (L.day ? 0.3 : 0.45);
       s += brandText(p, CX, topY, small ? 6.2 : 7.4, ink, L.ind === 'roman');
       const model = (p.model || '').replace(/["“”]/g, '').split(/\s+/)[0].toUpperCase();
       let sub = L.auto ? (/Mechanical/.test(p.specs.Movement) ? 'MECHANICAL' : 'AUTOMATIC') : p.style === 'chrono' ? (/Multifunction/.test(p.specs.Movement) ? 'MULTIFUNCTION' : 'CHRONOGRAPH') : p.style === 'diver' ? `WATER RESIST ${String(p.specs['Water Resistance']).toUpperCase()}` : /Solar|Eco/.test(p.specs.Movement) ? 'ECO-DRIVE' : model;
@@ -342,7 +355,9 @@
         s += `<circle cx="${hx + 4}" cy="${hy - 4}" r="3" fill="#c0392b" opacity=".85"/>`;
       } else if (L.date) {
         s += dateWindow(CX + dialR * 0.66, CY, dial);
+        if (L.cyclops) s += `<ellipse cx="${CX + dialR * 0.66}" cy="${CY}" rx="10.5" ry="8.5" fill="#fff" fill-opacity=".14" stroke="#fff" stroke-opacity=".55" stroke-width=".8"/>` + text(CX + dialR * 0.66, CY + 4.2, '30', 10, '#111', { weight: 700 });
       }
+      if (L.day) s += `<path d="M${CX - 17} ${CY - dialR + 11} Q${CX} ${CY - dialR + 7} ${CX + 17} ${CY - dialR + 11} L${CX + 15} ${CY - dialR + 20} Q${CX} ${CY - dialR + 17} ${CX - 15} ${CY - dialR + 20}Z" fill="#fbfbf8"/>` + text(CX, CY - dialR + 17, 'WEDNESDAY', 4.6, '#111', { weight: 800, ls: .3 });
       s += handSet(id, dialR - 3, dial, accent, { lume: p.style === 'diver' || p.style === 'field', wide: p.style === 'diver' || p.style === 'field', gold });
     }
     s += crystal(`<circle cx="${CX}" cy="${CY}" r="${dialR}"/>`, id);
