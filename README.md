@@ -1,6 +1,6 @@
 # TimeVault – Watch Selling Website
 
-A complete online watch store: 120 watches (₹100 – ₹20,000) in 7 categories, several colours per watch, search, filters, cart, wishlist, checkout (orders go to your WhatsApp, with COD) and Adsterra ad slots. It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**.
+A complete online watch store: 106 top-selling watch models (Casio G-Shock, Titan, Fastrack, Fossil, Timex, Seiko, Noise, boAt, Fire-Boltt and more, ₹129 – ₹20,000) in 7 categories, several colours per watch, search, filters, cart, wishlist, checkout (orders go to your WhatsApp, with COD) and Adsterra ad slots. It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**.
 
 ## Folder layout
 
@@ -12,7 +12,8 @@ A complete online watch store: 120 watches (₹100 – ₹20,000) in 7 categorie
 | `public/js/app.js` | Pages: home, shop, product, cart, checkout, wishlist, policies |
 | `public/js/ads.js` | Adsterra ad loader |
 | `public/js/watch-art.js` | Draws a watch picture when a colour has no photo yet |
-| `scripts/generate-products.js` | Script that created the starter catalogue |
+| `scripts/catalog.js` | The starter catalogue (models, prices, colours, specs) |
+| `scripts/generate-products.js` | Builds `public/js/products.js` from `scripts/catalog.js` (`npm run generate`) |
 
 ## 1. Put the site live on Firebase (first time)
 
@@ -92,7 +93,7 @@ Open `public/js/products.js`. Each watch looks like this:
 
 **Real photos:** copy the photo into `public/images/` and set `"image"` on that colour. Square or portrait photos on a plain background look best. While `image` is `""`, the site draws the watch in that colour instead.
 
-The starter brands (Chronex, Aurum, Velora…) are placeholder names. Rename them to the brands you actually stock.
+Prices in the starter catalogue are typical Indian market prices. Change them to your own selling prices, and remove any models you don't stock. Only list genuine products from brands you actually sell.
 
 ## Run it on your computer
 

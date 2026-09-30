@@ -93,6 +93,9 @@ button, input, select, textarea { font: inherit; }
 .chips { display: flex; flex-wrap: wrap; gap: 10px; }
 .chip { padding: 12px 22px; border-radius: 999px; background: var(--card); border: 1.5px solid var(--line); font-weight: 600; transition: all .15s; }
 .chip:hover { border-color: var(--gold); background: #fffaf0; }
+.brand-strip { display: flex; flex-wrap: wrap; gap: 10px; }
+.brand-chip { padding: 12px 22px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); font-weight: 700; letter-spacing: .02em; color: var(--navy); transition: transform .15s, color .15s; }
+.brand-chip:hover { transform: translateY(-2px); color: var(--gold); }
 .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .features > div { background: var(--card); padding: 22px; border-radius: var(--radius); box-shadow: var(--shadow); }
 .features span { font-size: 1.8rem; display: block; margin-bottom: 6px; }

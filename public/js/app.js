@@ -110,11 +110,15 @@
 
   // ---------- pages ----------
   function home() {
-    const best = PRODUCTS.filter((p) => p.stock > 0).sort((a, b) => b.reviews - a.reviews).slice(0, 8);
+    const best = PRODUCTS.filter((p) => p.stock > 0).sort((a, b) => b.pop - a.pop || b.reviews - a.reviews).slice(0, 8);
     const newest = PRODUCTS.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 8);
     const deals = PRODUCTS.filter((p) => off(p) >= 40 && p.stock > 0).slice(0, 8);
-    const luxury = PRODUCTS.filter((p) => p.category === 'luxury').sort((a, b) => b.price - a.price).slice(0, 4);
-    const hero = [byId.w001, luxury[0], PRODUCTS.find((p) => p.category === 'smart')];
+    const luxury = PRODUCTS.filter((p) => p.category === 'premium').sort((a, b) => b.pop - a.pop || b.price - a.price).slice(0, 4);
+    const find = (re) => PRODUCTS.find((p) => re.test(p.name)) || PRODUCTS[0];
+    const hero = [find(/GA-2100/), find(/Grant/), find(/ColorFit Pro 5/)];
+    const smartTop = PRODUCTS.filter((p) => p.category === 'smart').sort((a, b) => b.pop - a.pop).slice(0, 4);
+    const gshock = PRODUCTS.filter((p) => /G-Shock|Vintage|F-91W|Royale|Duro/.test(p.name)).sort((a, b) => b.pop - a.pop).slice(0, 8);
+    const brands = Object.entries(PRODUCTS.reduce((m, p) => { m[p.brand] = (m[p.brand] || 0) + p.pop; return m; }, {})).sort((a, b) => b[1] - a[1]).map(([b]) => b);
     const catTiles = CATS.map((c) => {
       const p = PRODUCTS.find((x) => x.category === c.id);
       const count = PRODUCTS.filter((x) => x.category === c.id).length;
@@ -126,23 +130,26 @@
         <div class="hero-text">
           <span class="eyebrow">New Season Collection 2026</span>
           <h1>Time looks better<br>on your wrist.</h1>
-          <p>Discover ${PRODUCTS.length}+ handpicked watches – classic analog, smartwatches, chronographs, luxury and kids – from ${money(Math.min(...PRODUCTS.map((p) => p.price)))} to ${money(Math.max(...PRODUCTS.map((p) => p.price)))}.</p>
-          <div class="hero-cta"><a href="#/shop" class="btn btn-gold">Shop All Watches</a><a href="#/shop?cat=luxury" class="btn btn-ghost">Luxury Collection</a></div>
+          <p>Discover ${PRODUCTS.length}+ handpicked watches – Casio G-Shock, Titan, Fossil, Noise, boAt and more – from ${money(Math.min(...PRODUCTS.map((p) => p.price)))} to ${money(Math.max(...PRODUCTS.map((p) => p.price)))}.</p>
+          <div class="hero-cta"><a href="#/shop" class="btn btn-gold">Shop All Watches</a><a href="#/shop?sort=popular" class="btn btn-ghost">Bestsellers</a></div>
           <div class="hero-trust"><span>✔ Cash on Delivery</span><span>✔ 1–2 Year Warranty</span><span>✔ 7-Day Returns</span></div>
         </div>
         <div class="hero-art">${hero.map((p, i) => `<a href="#/product/${p.id}" class="hero-watch hw${i}">${image(p, 0)}</a>`).join('')}</div>
       </div></section>
       <div class="container"><div data-ad="728x90" class="ad-slot"></div></div>
       ${section('Shop by Category', '#/shop', `<div class="cat-grid">${catTiles}</div>`)}
+      ${section('Top Brands', '', `<div class="brand-strip">${brands.map((b) => `<a class="brand-chip" href="#/shop?brand=${encodeURIComponent(b)}">${esc(b)}</a>`).join('')}</div>`)}
       ${section('Shop by Budget', '', `<div class="chips">${bands}</div>`)}
       ${section('Bestsellers', '#/shop?sort=popular', grid(best))}
       <div class="container"><div data-ad="native" class="ad-slot"></div></div>
       ${section('🔥 Hot Deals – 40% off & more', '#/shop?sort=discount', grid(deals))}
       <section class="banner-luxury"><div class="container banner-inner">
-        <div><span class="eyebrow">Luxury Collection</span><h2>Crafted for those who expect the finest</h2>
-        <p>Sapphire crystal, premium steel and 2-year warranty. Up to ${money(20000)}.</p><a href="#/shop?cat=luxury" class="btn btn-gold">Explore Luxury</a></div>
+        <div><span class="eyebrow">Premium Collection</span><h2>Automatics, chronographs &amp; iconic designs</h2>
+        <p>Seiko, Fossil, Citizen, Timex, Armani Exchange and more – up to ${money(20000)}.</p><a href="#/shop?cat=premium" class="btn btn-gold">Explore Premium</a></div>
         <div class="lux-row">${luxury.slice(0, 3).map((p) => `<a href="#/product/${p.id}">${image(p, 0)}</a>`).join('')}</div>
       </div></section>
+      ${section('⌚ G-Shock &amp; Casio Icons', '#/shop?q=casio', grid(gshock))}
+      ${section('Top Smartwatches', '#/shop?cat=smart&sort=popular', grid(smartTop))}
       ${section('New Arrivals', '#/shop?sort=new', grid(newest))}
       <div class="container"><div data-ad="728x90" class="ad-slot"></div></div>
       <section class="section"><div class="container features">
@@ -177,14 +184,14 @@
     if (q.q) {
       const words = q.q.toLowerCase().split(/\s+/).filter(Boolean);
       list = list.filter((p) => {
-        const hay = [p.name, p.brand, catName[p.category], p.description, p.strapType, p.audience, ...p.colors.map((c) => c.name)].join(' ').toLowerCase();
+        const hay = [p.name, p.brand, p.sku, catName[p.category], p.description, p.strapType, p.audience, ...p.colors.map((c) => c.name)].join(' ').toLowerCase();
         return words.every((w) => hay.includes(w));
       });
     }
     const sorts = {
       low: (a, b) => a.price - b.price,
       high: (a, b) => b.price - a.price,
-      popular: (a, b) => b.reviews - a.reviews,
+      popular: (a, b) => b.pop - a.pop || b.reviews - a.reviews,
       rating: (a, b) => b.rating - a.rating,
       discount: (a, b) => off(b) - off(a),
       new: (a, b) => b.createdAt.localeCompare(a.createdAt),
@@ -383,7 +390,7 @@
   function about() {
     return `<div class="container narrow prose"><h1>About ${esc(C.name)}</h1>
       <p>${esc(C.name)} is a trusted watch store bringing you stylish, reliable watches at honest prices. From everyday analog watches starting at ${money(100)} to premium luxury pieces up to ${money(20000)}, every watch in our collection is checked by our team before it is shipped.</p>
-      <p>We stock ${PRODUCTS.length}+ models across men's, women's, smartwatches, chronographs, luxury, sports and kids categories, in multiple colours and strap options.</p>
+      <p>We stock ${PRODUCTS.length}+ models across men's, women's, smartwatches, G-Shock & sports, chronographs, premium and kids categories, in multiple colours and strap options.</p>
       <h2>Why shop with us?</h2><ul><li>Quality-checked watches with warranty</li><li>Cash on Delivery across India</li><li>7-day easy returns & exchange</li><li>Friendly support on WhatsApp</li></ul>
       <div data-ad="728x90" class="ad-slot"></div></div>`;
   }
