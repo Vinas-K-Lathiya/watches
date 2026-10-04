@@ -20,7 +20,36 @@ GENERIC = {'date', 'watch', 'watches', 'automatic', 'chronograph', 'quartz', 'la
 BAD = ('caseback', 'case back', 'back of', 'display', 'collection', 'dealer', 'window', 'watches', 'exhibit', 'auction',
        'wristwatches', 'various', 'group', 'several', 'set of', 'detail', 'sub dials', 'sub-dials', 'dial of')
 # "brandSlug/modelSlug" pairs checked by eye and found to show the wrong watch.
-EXCLUDE = set()
+EXCLUDE = {
+    'a-lange-s-hne/double-split',
+    'a-lange-s-hne/grand-langematik',
+    'a-lange-s-hne/lange-1',
+    'a-lange-s-hne/lange-31',
+    'a-lange-s-hne/richard-lange',
+    'breitling/top-time',
+    'breitling/wings-lady',
+    'cartier/cl-de-cartier',
+    'cartier/panth-re',
+    'longines/dolcevita',
+    'longines/saint-imier',
+    'longines/symphonette',
+    'omega/speedmaster',
+    'omega/speedmaster-date',
+    'oris/chronoris',
+    'patek-philippe/minute-repeater',
+    'patek-philippe/nautilus',
+    'rolex/day-date-36',
+    'rolex/day-date-40',
+    'sinn/ezm-13',
+    'sinn/ezm-3',
+    'tag-heuer/monaco',
+    'tag-heuer/monaco-lady',
+    'tudor/royal',
+    'tudor/style',
+    'vacheron-constantin/overseas',
+    'vacheron-constantin/overseas-chronograph',
+    'zenith/pilot',
+}
 
 
 def norm(s):

@@ -12,6 +12,15 @@ python3 -c "import kagglehub; print(kagglehub.dataset_download('philmorekoung11/
 python3 scripts/build-market.py <the printed folder>/Watches.csv
 ```
 
+## Photos
+
+Watch photos come from **Wikimedia Commons** under free licences (CC BY, CC BY-SA, CC0, public domain). Each photo's author and licence are stored in `public/data/market/images.json` and shown under the photo and on the Photo Credits page (`#/market/credits`), as the licences require. To refresh them:
+
+```bash
+python3 scripts/fetch-images.py    # search Commons and download photos
+python3 scripts/clean-images.py    # remove mismatched/reused photos (edit EXCLUDE to drop more)
+```
+
 ## Folder layout
 
 | Path | What it is |
@@ -21,6 +30,8 @@ python3 scripts/build-market.py <the printed folder>/Watches.csv
 | `public/js/market.js` | Watch pages: home, all models, brands, brand page, model page with all listings |
 | `public/js/app.js` | Site shell: menu, footer, about/contact/disclaimer/privacy/terms, router |
 | `public/js/ads.js` | Adsterra ad loader |
+| `public/images/watches/` | Watch photos from Wikimedia Commons |
+| `scripts/fetch-images.py`, `scripts/clean-images.py` | Find and clean up the photos |
 | `scripts/build-market.py` | Builds `public/data/market/` from the Kaggle `Watches.csv` |
 
 ## 1. Put the site live on Firebase (first time)
