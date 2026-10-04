@@ -10,14 +10,11 @@ const path = require('path');
 const CATALOG = require('./catalog');
 
 const CATEGORIES = [
-  { id: 'men', name: "Men's Watches" },
-  { id: 'women', name: "Women's Watches" },
-  { id: 'smart', name: 'Smartwatches' },
-  { id: 'sports', name: 'G-Shock & Sports' },
-  { id: 'chrono', name: 'Chronographs' },
-  { id: 'premium', name: 'Premium Collection' },
-  { id: 'luxury', name: 'Luxury Swiss' },
-  { id: 'kids', name: 'Kids Watches' },
+  { id: 'nebula', name: 'Titan Nebula Gold' },
+  { id: 'xylys', name: 'Xylys Swiss' },
+  { id: 'titanlux', name: 'Titan Edge & Stellar' },
+  { id: 'swiss', name: 'Swiss Luxury' },
+  { id: 'designer', name: 'Designer Brands' },
 ];
 
 // Deterministic "random" so the output is stable between runs.
@@ -39,7 +36,7 @@ const STRAP_LINE = {
   fabric: 'The rugged canvas strap is light and breathable.',
   nato: 'The slip-through nylon strap is light, comfy and quick to swap.',
 };
-const WARRANTY = { Rolex: '5 Years', Omega: '5 Years', 'TAG Heuer': '2 Years', Tissot: '2 Years', Apple: '1 Year', Casio: '2 Years', Titan: '2 Years', Fastrack: '1 Year', Sonata: '1 Year', Timex: '1 Year', Fossil: '2 Years', Seiko: '1 Year', Citizen: '1 Year', HMT: '1 Year', TimeVault: '6 Months' };
+const WARRANTY = { Rado: '3 Years', Longines: '5 Years', Tissot: '2 Years', 'Frederique Constant': '2 Years', Movado: '2 Years', Titan: '2 Years', Xylys: '2 Years' };
 
 const products = CATALOG.map((c, i) => {
   const n = i + 1;
@@ -55,24 +52,24 @@ const products = CATALOG.map((c, i) => {
   const reviews = Math.round(pop * pop * (8 + rand() * 18));
   return {
     id: `w${String(n).padStart(3, '0')}`,
-    sku: c.ref,
+    sku: c.ref || '',
     name: `${c.b} ${c.m}`,
     brand: c.b,
     model: c.m,
     category: c.cat,
-    audience: c.cat === 'women' ? 'women' : c.cat === 'kids' ? 'kids' : 'unisex',
+    audience: c.women ? 'women' : 'men',
     price: c.p,
     mrp: c.mrp,
     rating: Math.min(4.9, Math.round((3.9 + pop * 0.09 + rand() * 0.15) * 10) / 10),
     reviews,
     pop,
-        badge: c.lux ? 'Luxury' : pop >= 10 ? 'Bestseller' : 1 - c.p / c.mrp >= 0.5 ? 'Big Discount' : pop >= 9 ? 'Top Rated' : '',
+    badge: c.cat === 'nebula' ? 'Solid Gold' : pop >= 9 ? 'Bestseller' : c.mrp > c.p ? 'Price Drop' : '',
     style: c.s,
     strapType: c.st,
     small: !!c.small,
     look: {
       ind: c.ind || 'stick', date: !!c.date, tachy: !!c.tachy, auto: !!c.auto, openheart: !!c.openheart, bezel2: !!c.bezel2,
-      fluted: !!c.fluted, gmt: !!c.gmt, day: !!c.day, cyclops: !!(c.lux && c.date),
+      fluted: !!c.fluted, gmt: !!c.gmt, day: !!c.day, cyclops: false, square: !!c.sq, dialName: c.dn || '',
       labels: c.labels || null,
     },
     colors: c.v.map((v) => ({ ...v, image: '' })),
@@ -81,14 +78,14 @@ const products = CATALOG.map((c, i) => {
     specs: {
       Brand: c.b,
       Model: c.m,
-      'Reference No.': c.ref,
+      ...(c.ref ? { 'Reference No.': c.ref } : {}),
       Movement: c.mv,
       'Case / Display Size': c.size,
       Strap: STRAP_LABEL[c.st],
       Glass: c.glass,
       'Water Resistance': c.wr,
-      Warranty: WARRANTY[c.b] || '1 Year',
-      'Price in India': c.p === c.mrp ? `₹${c.p.toLocaleString('en-IN')} (approx. retail)` : `₹${c.p.toLocaleString('en-IN')} (MRP ₹${c.mrp.toLocaleString('en-IN')})`,
+      Warranty: WARRANTY[c.b] || '2 Years (international)',
+      'Price in India': c.p === c.mrp ? `₹${c.p.toLocaleString('en-IN')} (approx.)` : `₹${c.p.toLocaleString('en-IN')} (MRP ₹${c.mrp.toLocaleString('en-IN')})`,
     },
     createdAt: `2026-${String(1 + Math.floor(rand() * 9)).padStart(2, '0')}-${String(1 + Math.floor(rand() * 28)).padStart(2, '0')}`,
   };

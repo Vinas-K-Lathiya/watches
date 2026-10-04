@@ -137,7 +137,7 @@
     return `<text x="${f1(x)}" y="${f1(y)}" font-size="${size}" fill="${fill}" text-anchor="${opts.anchor || 'middle'}" font-family="${opts.serif ? 'Georgia,Times,serif' : 'Helvetica,Arial,sans-serif'}" font-weight="${opts.weight || 700}" letter-spacing="${opts.ls || 0}"${opts.italic ? ' font-style="italic"' : ''}${opts.op ? ` opacity="${opts.op}"` : ''}>${str}</text>`;
   }
   function brandText(p, x, y, size, fill, serif) {
-    const name = p.brand.toUpperCase();
+    const name = ((p.look && p.look.dialName) || p.brand).toUpperCase();
     const fs = Math.min(size, (size * 9) / Math.max(6, name.length));
     return text(x, y, name, f1(fs), fill, { serif, ls: fs * 0.14 });
   }
@@ -195,6 +195,7 @@
     for (let i = 0; i < 12; i++) {
       if (skip12 && i === 0) continue;
       const deg = i * 30;
+      if (kind === 'museum') { if (i === 0) { const [mx, my] = polar(r - 9, 0); s += `<circle cx="${mx}" cy="${my}" r="5" fill="${gold ? `url(#hg${id})` : accent && lum(accent) > 120 && lum(accent) < 235 ? accent : '#d4af37'}"/>`; } continue; }
       const [x, y] = polar(r - 7, deg);
       if (kind === 'roman') {
         s += text(x, y + 3.6, roman[i], i % 3 === 0 ? 10.5 : 7.8, ink, { serif: true, weight: 600 });
@@ -252,6 +253,11 @@
     const light = isLight(dial);
     const ink = light ? '#1d1d1f' : '#f2f2f2';
     const gold = /Gold|Champagne/i.test(v.name) && !/Rose/.test(v.name) && lum(v.case) > 150 && v.case !== '#c9ccd1';
+    // Round or square case: shape(r, attrs) draws a circle, or a rounded square for square watches.
+    const sq = L.square;
+    const shape = (r, attrs) => sq
+      ? `<rect x="${f1(CX - r)}" y="${f1(CY - r * 1.12)}" width="${f1(2 * r)}" height="${f1(2 * r * 1.12)}" rx="${f1(r * 0.3)}" ${attrs}/>`
+      : `<circle cx="${CX}" cy="${CY}" r="${f1(r)}" ${attrs}/>`;
     let s = defs(id, v, resinCase);
     s += `<g filter="url(#sh${id})">`;
     s += strap(id, p.strapType, v.strap, sw, -10, CY - R + 14, true);
@@ -269,9 +275,9 @@
       });
     }
     // case
-    s += `<circle cx="${CX}" cy="${CY}" r="${R}" fill="url(#m${id})"/>`;
+    s += shape(R, `fill="url(#m${id})"`);
     s += `</g>`;
-    s += `<circle cx="${CX}" cy="${CY}" r="${R - 1.5}" fill="none" stroke="${shade(v.case, 55)}" stroke-width="1" opacity=".7"/>`;
+    s += shape(R - 1.5, `fill="none" stroke="${shade(v.case, 55)}" stroke-width="1" opacity=".7"`);
 
     let dialR = R - 7;
     // bezel variants
@@ -315,15 +321,15 @@
       }
       dialR = R - 10;
     } else {
-      s += `<circle cx="${CX}" cy="${CY}" r="${R - 4}" fill="none" stroke="url(#mr${id})" stroke-width="5"/>`;
+      s += shape(R - 4, `fill="none" stroke="url(#mr${id})" stroke-width="5"`);
       dialR = R - 6.5;
     }
 
     // dial
-    s += `<circle cx="${CX}" cy="${CY}" r="${dialR}" fill="url(#d${id})"/>`;
-    if (!kid && p.style !== 'field') s += sunburst(dialR, dial);
-    s += `<circle cx="${CX}" cy="${CY}" r="${dialR}" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.2"/>`;
-    s += minuteTrack(dialR - 1.5, ink, 2.6);
+    s += shape(dialR, `fill="url(#d${id})"`);
+    if (!kid && !sq && p.style !== 'field') s += sunburst(dialR, dial);
+    s += shape(dialR, `fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1.2"`);
+    if (!sq && L.ind !== 'museum') s += minuteTrack(dialR - 1.5, ink, 2.6);
 
     if (kid) {
       const cols = ['#e03131', '#2a6fdb', '#2e9e4f', '#f59f00'];
@@ -360,7 +366,7 @@
       if (L.day) s += `<path d="M${CX - 17} ${CY - dialR + 11} Q${CX} ${CY - dialR + 7} ${CX + 17} ${CY - dialR + 11} L${CX + 15} ${CY - dialR + 20} Q${CX} ${CY - dialR + 17} ${CX - 15} ${CY - dialR + 20}Z" fill="#fbfbf8"/>` + text(CX, CY - dialR + 17, 'WEDNESDAY', 4.6, '#111', { weight: 800, ls: .3 });
       s += handSet(id, dialR - 3, dial, accent, { lume: p.style === 'diver' || p.style === 'field', wide: p.style === 'diver' || p.style === 'field', gold });
     }
-    s += crystal(`<circle cx="${CX}" cy="${CY}" r="${dialR}"/>`, id);
+    s += crystal(shape(dialR, ""), id);
     return s;
   }
 

@@ -3,7 +3,7 @@
  * ============================================================ */
 window.STORE_CONFIG = {
   name: 'TimeVault',
-  tagline: 'Watch prices in India – Rolex to Casio',
+  tagline: 'Luxury watch prices in India',
   currency: '₹',
   locale: 'en-IN',
 

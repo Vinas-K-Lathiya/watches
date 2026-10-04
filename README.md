@@ -1,8 +1,8 @@
-# TimeVault – Watch Prices in India
+# TimeVault – Luxury Watch Prices in India
 
-A watch catalogue and price guide that earns money from **Adsterra ads**. It lists 122 popular watches with prices in India, specs and 336 colour variants, from Casio and Titan to Apple Watch, Rolex, Omega and TAG Heuer. There is no cart or checkout; visitors browse, compare, save and share. It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**.
+A luxury watch catalogue and price guide that earns money from **Adsterra ads**. It lists 101 luxury watches with prices in India, specs and 190 colour variants. The watches come from Titan's own luxury lines (Nebula solid gold, Xylys, Edge, Stellar, Maritime) and the luxury brands sold on Tata CLiQ Luxury (Rado, Longines, Tissot, Frederique Constant, Movado, Hugo Boss, Coach, Michael Kors, Emporio Armani and more). There is no cart or checkout; visitors browse, compare, save and share. It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**.
 
-Prices were last updated in September 2026. Luxury prices are official Indian retail prices where available; the rest are typical market prices. Update them in `scripts/catalog.js` and run `npm run generate`.
+Prices were last updated in October 2026. Where only a collection price range was available, the description says "(Approx. price)". Change prices in `scripts/catalog.js` (`p` = price, `mrp` = crossed-out MRP) and run `npm run generate`.
 
 ## Folder layout
 

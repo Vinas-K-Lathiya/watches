@@ -9,10 +9,10 @@
   const app = $('#app');
 
   const PRICE_BANDS = [
-    { label: 'Under ₹2,000', min: 0, max: 1999 },
-    { label: '₹2,000 – ₹10,000', min: 2000, max: 10000 },
-    { label: '₹10,000 – ₹50,000', min: 10000, max: 50000 },
-    { label: '₹50,000 – ₹5 Lakh', min: 50000, max: 500000 },
+    { label: 'Under ₹25,000', min: 0, max: 25000 },
+    { label: '₹25,000 – ₹75,000', min: 25000, max: 75000 },
+    { label: '₹75,000 – ₹2 Lakh', min: 75000, max: 200000 },
+    { label: '₹2 Lakh – ₹5 Lakh', min: 200000, max: 500000 },
     { label: 'Above ₹5 Lakh', min: 500000, max: 1e9 },
   ];
   const PER_PAGE = 24;
@@ -101,47 +101,51 @@
   // ---------- pages ----------
   function home() {
     const find = (re) => PRODUCTS.find((p) => re.test(p.name)) || PRODUCTS[0];
-    const hero = [find(/Submariner Date/), find(/Speedmaster/), find(/GA-2100/)];
+    const hero = [find(/Captain Cook Automatic/), find(/Nebula Swiss Automatic/), find(/PRX Powermatic/)];
+    const inCat = (c) => PRODUCTS.filter((p) => p.category === c);
     const trending = top(PRODUCTS, 8);
-    const luxury = top(PRODUCTS.filter((p) => p.category === 'luxury'), 8);
-    const budget = top(PRODUCTS.filter((p) => p.price < 2000), 8);
-    const smart = top(PRODUCTS.filter((p) => p.category === 'smart'), 8);
-    const casio = top(PRODUCTS.filter((p) => p.brand === 'Casio'), 8);
+    const nebula = top(inCat('nebula'), 8);
+    const swiss = top(inCat('swiss'), 8);
+    const titan = top(inCat('xylys').concat(inCat('titanlux')), 8);
+    const designer = top(inCat('designer'), 8);
+    const her = top(PRODUCTS.filter((p) => p.audience === 'women'), 8);
+    const under50 = top(PRODUCTS.filter((p) => p.price <= 50000), 8);
     const brands = Object.entries(PRODUCTS.reduce((m, p) => { m[p.brand] = (m[p.brand] || 0) + p.pop; return m; }, {})).sort((a, b) => b[1] - a[1]).map(([b]) => b);
     const catTiles = CATS.map((c) => {
-      const p = top(PRODUCTS.filter((x) => x.category === c.id), 1)[0];
-      const count = PRODUCTS.filter((x) => x.category === c.id).length;
-      return `<a class="cat-tile" href="#/shop?cat=${c.id}"><div class="cat-img">${image(p, 0)}</div><div><strong>${c.name}</strong><span class="muted">${count} models</span></div></a>`;
-    }).join('');
+      const p = top(inCat(c.id), 1)[0];
+      return `<a class="cat-tile" href="#/shop?cat=${c.id}"><div class="cat-img">${image(p, 0)}</div><div><strong>${c.name}</strong><span class="muted">${inCat(c.id).length} models</span></div></a>`;
+    }).join('') + `<a class="cat-tile" href="#/shop?aud=women"><div class="cat-img">${image(top(PRODUCTS.filter((p) => p.audience === 'women'), 1)[0], 0)}</div><div><strong>For Her</strong><span class="muted">${PRODUCTS.filter((p) => p.audience === 'women').length} models</span></div></a>`;
     const bands = PRICE_BANDS.map((b) => `<a class="chip" href="#/shop?min=${b.min}&max=${b.max}">${b.label}</a>`).join('');
     return `
       <section class="hero"><div class="container hero-inner">
         <div class="hero-text">
-          <span class="eyebrow">Watch Price Guide · Updated Sep 2026</span>
-          <h1>Every watch.<br>Every price.</h1>
-          <p>Latest prices in India, specs and colours for ${PRODUCTS.length}+ watches – Rolex, Omega, TAG Heuer, Tissot, Apple, Casio G-Shock, Titan, Fossil, Noise, boAt and more.</p>
-          <div class="hero-cta"><a href="#/shop" class="btn btn-gold">Browse All Watches</a><a href="#/shop?cat=luxury" class="btn btn-ghost">Rolex &amp; Luxury</a></div>
+          <span class="eyebrow">Luxury Watch Price Guide · Updated Oct 2026</span>
+          <h1>Luxury watches.<br>Real prices.</h1>
+          <p>Prices in India, specs and colours for ${PRODUCTS.length} luxury watches – Titan Nebula solid gold, Xylys, Titan Edge, Rado, Longines, Tissot, Movado, Hugo Boss, Coach, Michael Kors and more.</p>
+          <div class="hero-cta"><a href="#/shop" class="btn btn-gold">Browse All Watches</a><a href="#/shop?cat=nebula" class="btn btn-ghost">Solid Gold Nebula</a></div>
           <div class="hero-trust"><span>✔ Latest India prices</span><span>✔ Full specifications</span><span>✔ ${PRODUCTS.reduce((s, p) => s + p.colors.length, 0)} colour variants</span></div>
         </div>
         <div class="hero-art">${hero.map((p, i) => `<a href="#/product/${p.id}" class="hero-watch hw${i}">${image(p, 0)}</a>`).join('')}</div>
       </div></section>
       ${adRow()}
-      ${section('Browse by Category', '#/shop', `<div class="cat-grid">${catTiles}</div>`)}
+      ${section('Browse by Collection', '#/shop', `<div class="cat-grid">${catTiles}</div>`)}
       ${section('Top Brands', '', `<div class="brand-strip">${brands.map((b) => `<a class="brand-chip" href="#/shop?brand=${encodeURIComponent(b)}">${esc(b)}</a>`).join('')}</div>`)}
-      ${section('🔥 Trending Watches', '#/shop?sort=popular', grid(trending))}
+      ${section('🔥 Trending Luxury Watches', '#/shop?sort=popular', grid(trending))}
       ${adRow('native')}
       <section class="banner-luxury"><div class="container banner-inner">
-        <div><span class="eyebrow">Luxury Swiss</span><h2>Rolex, Omega &amp; TAG Heuer prices in India</h2>
-        <p>Submariner, Daytona, GMT-Master II, Speedmaster Moonwatch and more – official retail prices for 2026.</p><a href="#/shop?cat=luxury&sort=high" class="btn btn-gold">See Luxury Prices</a></div>
-        <div class="lux-row">${luxury.slice(0, 3).map((p) => `<a href="#/product/${p.id}">${image(p, 0)}</a>`).join('')}</div>
+        <div><span class="eyebrow">Titan Nebula</span><h2>India's solid gold watches</h2>
+        <p>18 karat solid gold watches by Titan – from ${lakh(Math.min(...nebula.map((p) => p.price)))} to ${lakh(Math.max(...nebula.map((p) => p.price)))}.</p><a href="#/shop?cat=nebula&sort=high" class="btn btn-gold">See Nebula Prices</a></div>
+        <div class="lux-row">${nebula.slice(0, 3).map((p) => `<a href="#/product/${p.id}">${image(p, 0)}</a>`).join('')}</div>
       </div></section>
-      ${section('👑 Luxury Icons', '#/shop?cat=luxury', grid(luxury))}
+      ${section('👑 Titan Nebula Solid Gold', '#/shop?cat=nebula', grid(nebula))}
       ${adRow()}
+      ${section('Swiss Luxury – Rado, Longines, Tissot', '#/shop?cat=swiss', grid(swiss))}
       ${section('Browse by Budget', '', `<div class="chips">${bands}</div>`)}
-      ${section('⌚ Best Smartwatches', '#/shop?cat=smart&sort=popular', grid(smart))}
+      ${section('Xylys, Titan Edge &amp; Stellar', '#/shop?cat=xylys', grid(titan))}
       ${adRow('native')}
-      ${section('Casio &amp; G-Shock Icons', '#/shop?brand=Casio', grid(casio))}
-      ${section('💰 Best Watches Under ₹2,000', '#/shop?max=1999&sort=popular', grid(budget))}
+      ${section('💎 For Her', '#/shop?aud=women', grid(her))}
+      ${section('Designer Brands', '#/shop?cat=designer', grid(designer))}
+      ${section('💰 Luxury Under ₹50,000', '#/shop?max=50000&sort=popular', grid(under50))}
       ${adRow()}`;
   }
 
@@ -161,6 +165,7 @@
     let list = PRODUCTS.slice();
     if (q.cat) list = list.filter((p) => p.category === q.cat);
     if (q.brand) list = list.filter((p) => p.brand === q.brand);
+    if (q.aud) list = list.filter((p) => p.audience === q.aud);
     if (q.color) list = list.filter((p) => p.colors.some((c) => c.name === q.color));
     if (q.strap) list = list.filter((p) => p.strapType === q.strap || (q.strap === 'metal' && p.strapType === 'jubilee'));
     if (q.min) list = list.filter((p) => p.price >= +q.min);
@@ -191,11 +196,11 @@
     const list = all.slice((page - 1) * PER_PAGE, page * PER_PAGE);
     const brands = [...new Set(PRODUCTS.map((p) => p.brand))].sort();
     const colors = [...new Map(PRODUCTS.flatMap((p) => p.colors).map((c) => [c.name, c.swatch])).entries()].sort().slice(0, 40);
-    const straps = [['leather', 'Leather'], ['metal', 'Steel Bracelet'], ['mesh', 'Mesh'], ['rubber', 'Silicone'], ['resin', 'Resin'], ['nato', 'NATO / Fabric']];
+    const straps = [['leather', 'Leather'], ['metal', 'Metal / Ceramic Bracelet'], ['mesh', 'Mesh'], ['rubber', 'Silicone']];
     const link = (patch) => buildQuery(Object.assign({}, q, { page: '' }, patch));
     const opt = (key, val, label) => `<a href="${link({ [key]: q[key] === val ? '' : val })}" class="f-opt${q[key] === val ? ' active' : ''}">${label}</a>`;
-    const title = q.q ? `Results for “${esc(q.q)}”` : q.brand ? `${esc(q.brand)} Watches Price in India` : q.cat ? `${catName[q.cat]} Price List` : 'All Watches – Price List';
-    const active = ['cat', 'brand', 'color', 'strap', 'q', 'min', 'max'].some((k) => q[k]);
+    const title = q.q ? `Results for “${esc(q.q)}”` : q.aud === 'women' ? 'Luxury Watches for Her' : q.brand ? `${esc(q.brand)} Watches Price in India` : q.cat ? `${catName[q.cat]} Price List` : 'All Watches – Price List';
+    const active = ['cat', 'aud', 'brand', 'color', 'strap', 'q', 'min', 'max'].some((k) => q[k]);
     const pager = pages > 1 ? `<nav class="pager">${Array.from({ length: pages }, (_, i) => `<a href="${buildQuery(Object.assign({}, q, { page: i + 1 }))}" class="${i + 1 === page ? 'active' : ''}">${i + 1}</a>`).join('')}</nav>` : '';
 
     return `<div class="container shop">
@@ -203,7 +208,7 @@
       <div class="shop-layout">
         <aside class="filters" id="filters">
           <div class="filters-head"><h3>Filters</h3>${active ? `<a href="#/shop" class="link">Clear all</a>` : ''}<button class="icon-btn close-filters" data-close-filters aria-label="Close filters">✕</button></div>
-          <div class="f-group"><h4>Category</h4>${CATS.map((c) => opt('cat', c.id, c.name)).join('')}</div>
+          <div class="f-group"><h4>Collection</h4>${CATS.map((c) => opt('cat', c.id, c.name)).join('')}${opt('aud', 'women', 'For Her')}</div>
           <div class="f-group"><h4>Price</h4>${PRICE_BANDS.map((b) => { const on = q.min === String(b.min) && q.max === String(b.max); return `<a href="${link(on ? { min: '', max: '' } : { min: b.min, max: b.max })}" class="f-opt${on ? ' active' : ''}">${b.label}</a>`; }).join('')}
             <form class="price-form" data-price-form><input type="number" name="min" placeholder="Min ₹" value="${esc(q.min || '')}" min="0"><input type="number" name="max" placeholder="Max ₹" value="${esc(q.max && +q.max < 1e9 ? q.max : '')}" min="0"><button class="btn btn-sm">Go</button></form></div>
           <div class="f-group"><h4>Brand</h4>${brands.map((b) => opt('brand', b, b)).join('')}</div>
@@ -236,7 +241,7 @@
     const related = PRODUCTS.filter((x) => x.id !== p.id && (x.category === p.category || x.brand === p.brand))
       .sort((a, b) => Math.abs(Math.log(a.price / p.price)) - Math.abs(Math.log(b.price / p.price))).slice(0, 8);
     const specs = Object.entries(p.specs).map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('');
-    const approx = p.price === p.mrp ? 'Approx. official retail price in India' : `Typical selling price · MRP ${money(p.mrp)}`;
+    const approx = p.price === p.mrp ? 'Approx. retail price in India' : `Current price · MRP ${money(p.mrp)}`;
     return `<div class="container pdp" data-pdp="${p.id}">
       <div class="crumbs"><a href="#/">Home</a> / <a href="#/shop?cat=${p.category}">${catName[p.category]}</a> / <a href="#/shop?brand=${encodeURIComponent(p.brand)}">${esc(p.brand)}</a> / <span>${esc(p.name)}</span></div>
       <div class="pdp-grid">
@@ -246,11 +251,11 @@
           <p class="small muted">Illustration for reference – not an official product photo.</p>
         </div>
         <div class="pdp-info">
-          <div class="card-brand">${esc(p.brand)} · Ref. ${esc(p.sku)}</div>
+          <div class="card-brand">${esc(p.brand)}${p.sku ? ` · Ref. ${esc(p.sku)}` : ''}</div>
           <h1>${esc(p.name)} Price in India</h1>
           <div class="rating"><span class="stars">${stars(p.rating)}</span> ${p.rating} · ${p.reviews} ratings</div>
           ${priceRow(p, true)}
-          <p class="muted small">${approx} · Updated Sep 2026</p>
+          <p class="muted small">${approx} · Updated Oct 2026</p>
           <div class="pdp-colors"><div><strong>Colour:</strong> <span id="pdpColorName">${esc(p.colors[0].name)}</span></div>
             <div class="swatches">${p.colors.map((c, i) => `<button class="swatch${i === 0 ? ' active' : ''}" style="--c:${c.swatch}" data-color="${i}" title="${esc(c.name)}" aria-label="${esc(c.name)}"></button>`).join('')}</div></div>
           <div class="buy-row">
@@ -286,7 +291,7 @@
 
   function about() {
     return `<div class="container narrow prose"><h1>About ${esc(C.name)}</h1>
-      <p>${esc(C.name)} is a free watch price guide for India. We list the latest prices, specifications and colour options for ${PRODUCTS.length}+ popular watches – from budget Casio and Sonata to smartwatches from Apple, Noise and boAt, all the way up to Rolex, Omega and TAG Heuer.</p>
+      <p>${esc(C.name)} is a free luxury watch price guide for India. We list the latest prices, specifications and colour options for ${PRODUCTS.length} luxury watches – Titan's Nebula, Xylys, Edge and Stellar collections, Swiss brands such as Rado, Longines, Tissot, Frederique Constant and Movado, and designer brands such as Hugo Boss, Coach, Michael Kors and Emporio Armani.</p>
       <p>Prices are collected from official brand price lists and authorised retailers and are updated regularly. Always confirm the final price with the brand or an authorised dealer before buying.</p>
       <div data-ad="728x90" class="ad-slot"></div></div>`;
   }
@@ -299,7 +304,7 @@
   }
 
   const PAGES = {
-    disclaimer: ['Disclaimer', `<p>${esc(C.name)} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by Rolex, Omega, TAG Heuer, Tissot, Apple, Casio, Titan or any other brand listed. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p>Prices shown are approximate retail prices in India at the time of the last update and may change at any time. Please check the official brand website or an authorised retailer for the current price.</p><p>Watch pictures on this site are illustrations for reference only and are not official product photographs.</p>`],
+    disclaimer: ['Disclaimer', `<p>${esc(C.name)} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by Titan Company, Tata CLiQ, Rado, Longines, Tissot, Movado or any other brand or retailer mentioned. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p>Prices shown are approximate retail prices in India at the time of the last update and may change at any time. Please check the official brand website or an authorised retailer for the current price.</p><p>Watch pictures on this site are illustrations for reference only and are not official product photographs.</p>`],
     privacy: ['Privacy Policy', `<p>We do not require you to create an account. Your saved watches are stored only in your own browser.</p><p><strong>Advertising:</strong> This website shows ads served by third-party networks such as Adsterra. These partners may use cookies or similar technologies to show relevant ads and measure performance. You can control cookies through your browser settings.</p><p>For any privacy questions, contact ${esc(C.email)}.</p>`],
     terms: ['Terms of Use', '<p>By using this website you agree to these terms. All information is provided "as is" for general information only. We make no guarantee that prices or specifications are complete or current. We are not responsible for any purchase decision made based on this website.</p>'],
   };
