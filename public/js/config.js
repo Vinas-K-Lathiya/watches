@@ -6,6 +6,8 @@ window.STORE_CONFIG = {
   tagline: 'Luxury watch prices in India',
   currency: '₹',
   locale: 'en-IN',
+  // Used to show rupee values for the US-dollar prices in Market Prices.
+  usdToInr: 88,
 
   // Shown on the Contact page.
   email: 'support@timevault.store',

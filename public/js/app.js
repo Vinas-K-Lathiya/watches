@@ -131,6 +131,11 @@
       ${section('Browse by Collection', '#/shop', `<div class="cat-grid">${catTiles}</div>`)}
       ${section('Top Brands', '', `<div class="brand-strip">${brands.map((b) => `<a class="brand-chip" href="#/shop?brand=${encodeURIComponent(b)}">${esc(b)}</a>`).join('')}</div>`)}
       ${section('🔥 Trending Luxury Watches', '#/shop?sort=popular', grid(trending))}
+      <section class="section"><div class="container"><a class="mk-banner" href="#/market">
+        <div><span class="eyebrow">New · Market Prices Database</span><h2>Real prices from 2.4 lakh+ luxury watch listings</h2>
+        <p>Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Richard Mille and more – 958 models and 39,000+ reference numbers.</p><span class="btn btn-gold">Explore Market Prices</span></div>
+        <div class="lux-row">${['Rolex|Submariner', 'Patek Philippe|Nautilus', 'Audemars Piguet|Royal Oak'].map((x) => `<span>${Market.art(...x.split('|'))}</span>`).join('')}</div>
+      </a></div></section>
       ${adRow('native')}
       <section class="banner-luxury"><div class="container banner-inner">
         <div><span class="eyebrow">Titan Nebula</span><h2>India's solid gold watches</h2>
@@ -227,6 +232,7 @@
             </div>
           </div>
           <div data-ad="728x90" class="ad-slot"></div>
+          <div id="marketHint"></div>
           ${list.length ? grid(list, 8) : `<div class="empty"><p>No watches match these filters.</p><a href="#/shop" class="btn">Clear filters</a></div>`}
           ${pager}
           <div data-ad="728x90" class="ad-slot"></div>
@@ -333,8 +339,19 @@
       case 'contact': html = contact(); break;
       case 'page': html = staticPage(parts[1]); break;
       case 'cart': case 'checkout': case 'order': location.hash = '#/'; return;
+      case 'market':
+        // Market pages load their data on demand, so market.js fills #app itself.
+        document.title = `Luxury Watch Market Prices – ${C.name}`;
+        document.body.classList.remove('filters-open', 'menu-open');
+        document.querySelectorAll('#navLinks a').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#/market'));
+        if (!route.lastWasMarketModel || parts.length < 3) window.scrollTo(0, 0);
+        route.lastWasMarketModel = parts.length === 3;
+        route.lastWasShop = false;
+        Market.render(app, parts.slice(1), qs);
+        return;
       default: html = notFound();
     }
+    route.lastWasMarketModel = false;
     document.title = title;
     app.innerHTML = html;
     document.body.classList.remove('filters-open', 'menu-open');
@@ -345,6 +362,7 @@
     else if (window.scrollY > shopTop) window.scrollTo(0, shopTop);
     route.lastWasShop = parts[0] === 'shop';
     if (parts[0] === 'product') setupPdp(byId[parts[1]]);
+    if (parts[0] === 'shop') Market.hint($('#marketHint'), parseQuery(qs).q);
     Ads.render(document);
   }
 
@@ -411,7 +429,7 @@
     document.querySelectorAll('#storeName, .js-store-name').forEach((el) => { el.textContent = C.name; });
     $('#year').textContent = new Date().getFullYear();
     $('#footerTagline').textContent = C.tagline;
-    $('#navLinks').innerHTML = `<a href="#/">Home</a><a href="#/shop">All Watches</a>` + CATS.map((c) => `<a href="#/shop?cat=${c.id}">${c.name}</a>`).join('');
+    $('#navLinks').innerHTML = `<a href="#/">Home</a><a href="#/shop">All Watches</a>` + CATS.map((c) => `<a href="#/shop?cat=${c.id}">${c.name}</a>`).join('') + `<a href="#/market" class="nav-hot">Market Prices</a>`;
     $('#footerCats').innerHTML = CATS.map((c) => `<li><a href="#/shop?cat=${c.id}">${c.name}</a></li>`).join('');
     $('#footerBrands').innerHTML = [...new Set(PRODUCTS.filter((p) => p.pop >= 8).map((p) => p.brand))].slice(0, 10).map((b) => `<li><a href="#/shop?brand=${encodeURIComponent(b)}">${esc(b)} Watches</a></li>`).join('');
     $('#menuBtn').addEventListener('click', () => document.body.classList.toggle('menu-open'));

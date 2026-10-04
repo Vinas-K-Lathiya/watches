@@ -4,6 +4,17 @@ A luxury watch catalogue and price guide that earns money from **Adsterra ads**.
 
 Prices were last updated in October 2026. Where only a collection price range was available, the description says "(Approx. price)". Change prices in `scripts/catalog.js` (`p` = price, `mrp` = crossed-out MRP) and run `npm run generate`.
 
+## Market Prices database
+
+The **Market Prices** section (`#/market`) holds 242,059 real asking-price listings for 958 models and 39,000+ reference numbers from 20+ luxury brands (Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Richard Mille, ...). The listings were scraped from chrono24.com in July 2023 and come from the [Luxury Watch Listings dataset](https://github.com/philmorefkoung/Webscrapped-Watch-Dataset) by Philmore Koung (MIT licence). Prices are in US dollars, with an approximate rupee value (`usdToInr` in `config.js`).
+
+The data is split into small JSON files in `public/data/market/` that the browser loads only when needed. To rebuild them:
+
+```bash
+git clone --depth 1 https://github.com/philmorefkoung/Webscrapped-Watch-Dataset /tmp/wds
+python3 scripts/build-market.py /tmp/wds/dataset
+```
+
 ## Folder layout
 
 | Path | What it is |
