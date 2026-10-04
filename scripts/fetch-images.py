@@ -10,14 +10,15 @@ which the site shows under the photo and on the Photo Credits page
 
 Usage:  python3 scripts/fetch-images.py
 """
-import json, os, re, sys, time, urllib.parse, urllib.request
+import json, os, re, sys, time, urllib.error, urllib.parse, urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', 'public')
 DATA = os.path.join(ROOT, 'data', 'market')
 OUT = os.path.join(ROOT, 'images', 'watches')
 API = 'https://commons.wikimedia.org/w/api.php'
 UA = 'TimeVaultWatchPrices/1.0 (https://timevault-watches-2026.web.app; image credits shown on site)'
-WIDTH = 640
+WIDTH = 500  # one of Wikimedia's standard thumbnail sizes (other sizes get rate-limited)
 
 # Words that don't identify a model on their own.
 GENERIC = {'date', 'watch', 'watches', 'automatic', 'chronograph', 'quartz', 'lady', 'ladies', 'men', 'mens', 'women',
@@ -104,8 +105,17 @@ def pick(q, bkeys, mkeys):
 
 def download(url, path):
     req = urllib.request.Request(url, headers={'User-Agent': UA})
-    with urllib.request.urlopen(req, timeout=60) as r, open(path, 'wb') as fh:
-        fh.write(r.read())
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                data = r.read()
+            with open(path, 'wb') as fh:
+                fh.write(data)
+            return
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or attempt == 4:
+                raise
+            time.sleep(5 * (attempt + 1))
 
 
 def main():
@@ -113,27 +123,33 @@ def main():
     credits_path = os.path.join(DATA, 'images.json')
     credits = json.load(open(credits_path)) if os.path.exists(credits_path) else {}
     jobs = [(m[0], m[1], m[2], m[3]) for m in index['models'] if m[3] != 'Other models' and m[5] >= 3]
-    found = 0
-    for n, (bs, ms, brand, model) in enumerate(jobs, 1):
-        key = f'{bs}/{ms}'
-        if key in credits:
-            found += 1
-            continue
+    todo = [j for j in jobs if f'{j[0]}/{j[1]}' not in credits]
+    print(f'{len(jobs) - len(todo)} already done, {len(todo)} to check', flush=True)
+
+    def work(job):
+        bs, ms, brand, model = job
         hit = search(brand, model)
-        if hit:
-            os.makedirs(os.path.join(OUT, bs), exist_ok=True)
-            ext = '.png' if hit['thumb'].lower().endswith('.png') else '.jpg'
-            rel = f'images/watches/{bs}/{ms}{ext}'
-            try:
-                download(hit['thumb'], os.path.join(ROOT, rel))
-                credits[key] = {'src': rel, **{k: hit[k] for k in ('page', 'title', 'author', 'licence', 'licenceUrl')}}
-                found += 1
-            except Exception as e:
-                print('download failed', key, e, file=sys.stderr)
-        if n % 50 == 0:
-            print(f'{n}/{len(jobs)} checked, {found} photos', flush=True)
-            json.dump(credits, open(credits_path, 'w'), ensure_ascii=False, separators=(',', ':'))
-        time.sleep(0.2)
+        if not hit:
+            return None
+        os.makedirs(os.path.join(OUT, bs), exist_ok=True)
+        ext = '.png' if hit['thumb'].lower().endswith('.png') else '.jpg'
+        rel = f'images/watches/{bs}/{ms}{ext}'
+        try:
+            download(hit['thumb'], os.path.join(ROOT, rel))
+        except Exception as e:
+            print('download failed', bs, ms, e, file=sys.stderr)
+            return None
+        return f'{bs}/{ms}', {'src': rel, **{k: hit[k] for k in ('page', 'title', 'author', 'licence', 'licenceUrl')}}
+
+    # A few requests at a time keeps it fast while staying polite to Wikimedia.
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        for n, res in enumerate(pool.map(work, todo), 1):
+            if res:
+                credits[res[0]] = res[1]
+            if n % 50 == 0:
+                print(f'{n}/{len(todo)} checked, {len(credits)} photos', flush=True)
+                json.dump(credits, open(credits_path, 'w'), ensure_ascii=False, separators=(',', ':'))
+    found = len(credits)
     json.dump(credits, open(credits_path, 'w'), ensure_ascii=False, separators=(',', ':'))
     print(f'Done: {found} photos for {len(jobs)} brands/models')
 
