@@ -3,7 +3,7 @@
  * ============================================================ */
 window.STORE_CONFIG = {
   name: 'TimeVault',
-  tagline: 'Luxury watch prices in India',
+  tagline: 'Luxury watch price database',
   currency: '₹',
   locale: 'en-IN',
   // Used to show rupee values for the US-dollar prices in Market Prices.

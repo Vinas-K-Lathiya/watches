@@ -1,32 +1,28 @@
-# TimeVault – Luxury Watch Prices in India
+# TimeVault – Luxury Watch Price Database
 
-A luxury watch catalogue and price guide that earns money from **Adsterra ads**. It lists 101 luxury watches with prices in India, specs and 190 colour variants. The watches come from Titan's own luxury lines (Nebula solid gold, Xylys, Edge, Stellar, Maritime) and the luxury brands sold on Tata CLiQ Luxury (Rado, Longines, Tissot, Frederique Constant, Movado, Hugo Boss, Coach, Michael Kors, Emporio Armani and more). There is no cart or checkout; visitors browse, compare, save and share. It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**.
+A luxury watch price website that earns money from **Adsterra ads**. It is built on the [Luxury Watch Listings dataset](https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings) by Philmore Koung: 284,491 asking-price listings scraped from chrono24.com in July 2023. After removing exact duplicates the site has **272,918 listings** of **1,000 models** and 39,000+ reference numbers from 29 brands (Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Richard Mille, ...). Prices are in US dollars with an approximate rupee value (`usdToInr` in `config.js`).
 
-Prices were last updated in October 2026. Where only a collection price range was available, the description says "(Approx. price)". Change prices in `scripts/catalog.js` (`p` = price, `mrp` = crossed-out MRP) and run `npm run generate`.
+It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**. The data is split into small JSON files in `public/data/market/` that the browser loads only when a page needs them.
 
-## Market Prices database
-
-The **Market Prices** section (`#/market`) holds 242,059 real asking-price listings for 958 models and 39,000+ reference numbers from 20+ luxury brands (Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Richard Mille, ...). The listings were scraped from chrono24.com in July 2023 and come from the [Luxury Watch Listings dataset](https://github.com/philmorefkoung/Webscrapped-Watch-Dataset) by Philmore Koung (MIT licence). Prices are in US dollars, with an approximate rupee value (`usdToInr` in `config.js`).
-
-The data is split into small JSON files in `public/data/market/` that the browser loads only when needed. To rebuild them:
+## Rebuilding the data
 
 ```bash
-git clone --depth 1 https://github.com/philmorefkoung/Webscrapped-Watch-Dataset /tmp/wds
-python3 scripts/build-market.py /tmp/wds/dataset
+pip install kagglehub
+python3 -c "import kagglehub; print(kagglehub.dataset_download('philmorekoung11/luxury-watch-listings'))"
+python3 scripts/build-market.py <the printed folder>/Watches.csv
 ```
 
 ## Folder layout
 
 | Path | What it is |
 |---|---|
-| `public/js/config.js` | **Site settings**: site name, contact email, **Adsterra keys** |
-| `public/js/products.js` | **All watches**: name, price, MRP, colours, description, specs, stock |
-| `public/images/` | Put your real watch photos here |
-| `public/js/app.js` | Pages: home, watch list with filters, watch details, saved watches, disclaimer/privacy/terms |
+| `public/js/config.js` | **Site settings**: site name, contact email, dollar-to-rupee rate, **Adsterra keys** |
+| `public/data/market/` | The watch database (generated – don't edit by hand) |
+| `public/js/market.js` | Watch pages: home, all models, brands, brand page, model page with all listings |
+| `public/js/app.js` | Site shell: menu, footer, about/contact/disclaimer/privacy/terms, router |
 | `public/js/ads.js` | Adsterra ad loader |
-| `public/js/watch-art.js` | Draws a watch picture when a colour has no photo yet |
-| `scripts/catalog.js` | The starter catalogue (models, prices, colours, specs) |
-| `scripts/generate-products.js` | Builds `public/js/products.js` from `scripts/catalog.js` (`npm run generate`) |
+| `public/js/watch-art.js` | Draws the watch pictures (the dataset has no photos) |
+| `scripts/build-market.py` | Builds `public/data/market/` from the Kaggle `Watches.csv` |
 
 ## 1. Put the site live on Firebase (first time)
 
@@ -60,11 +56,12 @@ To publish changes later, just run `firebase deploy --only hosting` again.
 1. Run `firebase init hosting:github` in this folder and follow the prompts. It creates the `FIREBASE_SERVICE_ACCOUNT_...` secret for you. Rename it to `FIREBASE_SERVICE_ACCOUNT` in GitHub → Settings → Secrets, or change the secret name in the workflow.
 2. In GitHub → Settings → Secrets and variables → Actions → **Variables**, add `FIREBASE_PROJECT_ID` = your project ID.
 
-## 2. Make it your store
+## 2. Site settings
 
 Edit `public/js/config.js`:
 
-- `name`, `tagline`: your shop name
+- `name`, `tagline`: your site name
+- `usdToInr`: rate used for the rupee values
 - `email`: shown on the Contact page
 
 ## 3. Add Adsterra ads
@@ -77,35 +74,7 @@ Edit `public/js/config.js`:
    - Social Bar / Popunder: copy the script `src`.
 4. Deploy again.
 
-Ad slots are on the home page (several), the watch list (top, inside the grid every 8 watches, sidebar, bottom), every watch page (3 slots), the static pages and the footer. Mobile screens automatically get the smaller banner sizes. To see where ads will appear before you have keys, open the site with `?adpreview` at the end of the URL (e.g. `https://yoursite.web.app/?adpreview`).
-
-## 4. Add or edit watches
-
-Open `public/js/products.js`. Each watch looks like this:
-
-```js
-{
-  "id": "w001",               // unique, used in the product URL
-  "name": "Chronex Classic Pro",
-  "brand": "Chronex",
-  "category": "men",          // men | women | smart | chrono | luxury | sports | kids
-  "price": 1299,
-  "mrp": 1999,                // crossed-out price
-  "stock": 25,                // 0 = sold out
-  "badge": "New",             // optional: New, Bestseller, Hot Deal, Premium, or ""
-  "colors": [
-    { "name": "Midnight Black", "swatch": "#111111", "dial": "#141414", "case": "#2b2b2b", "strap": "#1a1a1a", "accent": "#d4af37",
-      "image": "images/chronex-classic-black.jpg" }
-  ],
-  "description": "…",
-  "features": ["…"],
-  "specs": { "Movement": "Japanese Quartz", "Case Size": "42 mm" }
-}
-```
-
-**Real photos:** copy the photo into `public/images/` and set `"image"` on that colour. Square or portrait photos on a plain background look best. While `image` is `""`, the site draws the watch in that colour instead.
-
-Prices in the starter catalogue are typical Indian market prices. Change them to your own selling prices, and remove any models you don't stock. Only list genuine products from brands you actually sell.
+Ad slots are on the home page (several), the model lists (top, inside the grid every 12 models, bottom), every brand page and every model page (4–5 slots), the info pages and the footer. Mobile screens automatically get the smaller banner sizes. To see where ads will appear before you have keys, open the site with `?adpreview` at the end of the URL (e.g. `https://yoursite.web.app/?adpreview`).
 
 ## Run it on your computer
 

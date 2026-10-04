@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
-Builds the "Market Prices" database (public/data/market/) from the
-Luxury Watch Listings dataset (284k Chrono24 listings, July 2023):
-  https://github.com/philmorefkoung/Webscrapped-Watch-Dataset  (MIT licence)
+Builds the watch database (public/data/market/) from the Luxury Watch
+Listings dataset (284,491 Chrono24 listings, July 2023) by Philmore Koung:
+  https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings
 
 Usage:
-  git clone --depth 1 https://github.com/philmorefkoung/Webscrapped-Watch-Dataset /tmp/wds
-  python3 scripts/build-market.py /tmp/wds/dataset
+  pip install kagglehub
+  python3 -c "import kagglehub; print(kagglehub.dataset_download('philmorekoung11/luxury-watch-listings'))"
+  python3 scripts/build-market.py <printed path>/Watches.csv
+
+(A folder of the per-brand CSVs from
+ https://github.com/philmorefkoung/Webscrapped-Watch-Dataset also works.)
 
 Output (loaded on demand by the website):
   public/data/market/index.json                 brands + model search index
@@ -61,24 +65,31 @@ def most_common(values):
     return max(set(vals), key=vals.count) if vals else ''
 
 
+files = [SRC] if SRC.endswith('.csv') else sorted(glob.glob(os.path.join(SRC, '*.csv')))
 rows = []
-for f in sorted(glob.glob(os.path.join(SRC, '*.csv'))):
+for f in files:
     for r in read(f):
-        brand = clean(r.get('brand'))
-        model = clean(r.get('model'))
-        if not brand or not model:
-            continue
         name = (r.get('name') or '').split('\n')
+        first = clean(name[0])
+        brand = clean(r.get('brand'))
+        if not brand:
+            brand = 'Other brands'
+        model = clean(r.get('model'))
+        if not model:
+            # About 30,000 listings have no model field; use the listing name instead.
+            model = first[len(brand):].strip(' -') if first.lower().startswith(brand.lower()) else ''
+            model = model if 2 <= len(model) <= 40 else 'Other models'
         title = clean(' '.join(name[1:])) if len(name) > 1 else ''
         yop = clean(r.get('yop'))
         yop = '' if yop == 'Unknown' else yop.replace(' (Approximation)', '~')
         rows.append({
             'brand': brand, 'model': model, 'ref': clean(r.get('ref')), 'title': title[:80],
-            'price': price(r.get('price')), 'cond': clean(r.get('cond')), 'yop': yop,
+            'price': price(r.get('price')), 'cond': clean(r.get('cond')) or clean(r.get('condition')), 'yop': yop,
             'mvmt': clean(r.get('mvmt')), 'casem': clean(r.get('casem')), 'bracem': clean(r.get('bracem')),
             'sex': SEX.get(clean(r.get('sex')), ''), 'size': re.sub(r'\s*mm', '', clean(r.get('size'))).strip(),
         })
 
+raw_count = len(rows)
 # Remove exact duplicate listings (the scraper visited some pages twice).
 seen, uniq = set(), []
 for r in rows:
@@ -96,7 +107,7 @@ if os.path.isdir(OUT):
     shutil.rmtree(OUT)
 os.makedirs(os.path.join(OUT, 'l'))
 
-index = {'source': 'Luxury Watch Listings dataset (Chrono24, July 2023)', 'listings': len(rows), 'brands': [], 'models': []}
+index = {'source': 'Luxury Watch Listings dataset (Chrono24, July 2023)', 'listings': len(rows), 'raw': raw_count, 'brands': [], 'models': []}
 for brand in sorted(by_brand, key=lambda b: -sum(len(v) for v in by_brand[b].values())):
     bs = slug(brand)
     os.makedirs(os.path.join(OUT, 'l', bs))
