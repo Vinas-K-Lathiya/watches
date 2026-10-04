@@ -30,42 +30,6 @@
     return cache[path];
   }
 
-  // ---------- picture: a drawn watch that matches the model's design ----------
-  function hash(s) { let h = 0; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) | 0; return Math.abs(h); }
-  const DIALS = ['#151515', '#1d4f8c', '#f4f3ef', '#dcdde0', '#1f4d3a', '#15213b'];
-  function pseudo(brand, model, info) {
-    const m = model.toLowerCase();
-    const caseMat = (info && info.case) || '';
-    const look = { ind: 'stick', dialName: brand.length > 14 ? brand.split(/[\s.&]+/).filter(Boolean).map((w) => w[0]).join('') : brand };
-    let style = 'dress', strap = 'metal';
-    if (/gmt|explorer ii|worldtimer|zulu/.test(m)) { style = 'diver'; look.gmt = true; look.bezel2 = /gmt-master|pepsi/.test(m); }
-    else if (/submariner|seamaster|diver|aquaracer|fifty|pelagos|black bay|sea-dweller|deepsea|planet ocean|superocean|aquanaut|hydroconquest|prospex|submersible|aquatimer|aquis|yacht|marine|ocean|turtle|samurai/.test(m)) style = 'diver';
-    else if (/chrono|daytona|speedmaster|navitimer|carrera|el primero|offshore|monaco|big bang|top time|chronomat|avenger|bullhead|chronomaster|defy/.test(m)) style = 'chrono';
-    else if (/pilot|flieger|spitfire|khaki|aviat|field|ranger|explorer/.test(m)) { style = 'field'; look.ind = 'field'; }
-    if (/tank|santos|reverso|monaco|square|^rm|rm ?\d|baignoire|cintr|panthere/.test(m)) look.square = true;
-    if (/datejust|day-date|president/.test(m)) { look.fluted = true; look.date = true; }
-    if (/date/.test(m)) look.date = true;
-    if (/tachy|daytona|speedmaster|carrera/.test(m)) look.tachy = true;
-    if (/patrimony|calatrava|lange|classique|master|heritage|saxonia|1815/.test(m)) look.ind = 'roman';
-    let kase = '#c9ccd1';
-    if (/rose|red gold|everose/i.test(caseMat)) kase = '#d9937f';
-    else if (/yellow gold|^gold$/i.test(caseMat)) kase = '#d9b44a';
-    else if (/gold\/steel/i.test(caseMat)) kase = '#d4af37';
-    else if (/ceramic|carbon|dlc|pvd/i.test(caseMat)) kase = '#2b2b2b';
-    else if (/titanium/i.test(caseMat)) kase = '#a9abae';
-    else if (/platinum|white gold/i.test(caseMat)) kase = '#e6e6e8';
-    if (/leather|alligator|croc|calf/.test((info && info.brace || '').toLowerCase()) || /patrimony|calatrava|lange|reverso|tank|master|portofino|portugieser|1815|saxonia/.test(m)) strap = 'leather';
-    if (/rubber/.test((info && info.brace || '').toLowerCase()) || /big bang|offshore|rm|luminor|radiomir/.test(m)) strap = 'rubber';
-    const dial = DIALS[hash(brand + model) % DIALS.length];
-    const light = WatchArt.isLight(dial);
-    const strapColor = strap === 'metal' ? kase : strap === 'rubber' ? '#1b1b1b' : ['#6b4226', '#151515', '#3d2a1e'][hash(model) % 3];
-    return {
-      p: { name: `${brand} ${model}`, brand, model, style, strapType: strap, small: !!(info && info.women), look, specs: { Movement: (info && info.mvmt) || '', 'Water Resistance': '' }, features: [] },
-      v: { name: model, dial, case: kase, strap: strapColor, accent: light ? '#1d1d1f' : '#ffffff', swatch: dial },
-    };
-  }
-  function art(brand, model, info) { const x = pseudo(brand, model, info); return WatchArt.svg(x.p, x.v); }
-
   // ---------- shared bits ----------
   const ad = (t) => `<div data-ad="${t || '728x90'}" class="ad-slot"></div>`;
   const loading = '<div class="mk-loading">Loading market data…</div>';
@@ -92,7 +56,6 @@
 
   function brandCard(b) {
     return `<a class="card mk-card" href="#/market/${b.slug}">
-      <div class="card-img">${art(b.brand, b.top[0] || '')}</div>
       <div class="card-body"><div class="card-title">${esc(b.brand)}</div>
         <div class="small muted">${fmt(b.listings)} listings · ${b.models} models</div>
         <div class="price-row"><span class="small muted">Typical</span><span class="price">${usd(b.med)}</span></div>
@@ -101,7 +64,6 @@
   // m = [brandSlug, modelSlug, brand, model, medianUsd, listings]
   function modelCard(m) {
     return `<a class="card mk-card" href="#/market/${m[0]}/${m[1]}">
-      <div class="card-img">${art(m[2], m[3])}</div>
       <div class="card-body"><div class="card-brand">${esc(m[2])}</div><div class="card-title">${esc(m[3])}</div>
         <div class="small muted">${fmt(m[5])} listings</div>
         <div class="price-row"><span class="price">${usd(m[4])}</span><span class="muted small">${inr(m[4])}</span></div></div></a>`;
@@ -116,7 +78,6 @@
       const priciest = models.filter((m) => m[5] >= 20).sort((x, y) => y[4] - x[4]).slice(0, 8);
       const entry = models.filter((m) => m[5] >= 50 && m[4] <= 2500).sort((x, y) => y[5] - x[5]).slice(0, 8);
       const section = (title, link, inner) => `<section class="section"><div class="section-head"><h2>${title}</h2>${link ? `<a href="${link}" class="link">View all →</a>` : ''}</div>${inner}</section>`;
-      const hero = ['Rolex|Submariner Date', 'Patek Philippe|Nautilus', 'Audemars Piguet|Royal Oak Chronograph'];
       return `<section class="hero"><div class="container hero-inner">
           <div class="hero-text">
             <span class="eyebrow">Luxury Watch Price Database</span>
@@ -125,7 +86,12 @@
             <form class="mk-search" data-mk-search><input name="q" type="search" placeholder="Search a model, e.g. Submariner, Nautilus, Royal Oak…" aria-label="Search models"><button class="btn btn-gold">Search</button></form>
             <div class="hero-trust"><span>✔ ${fmt(idx.listings)} listings</span><span>✔ 39,000+ reference numbers</span><span>✔ Prices in $ and ₹</span></div>
           </div>
-          <div class="hero-art">${hero.map((x, i) => { const [br, mo] = x.split('|'); const m = idx.models.find((y) => y[2] === br && y[3] === mo); return `<a href="${m ? `#/market/${m[0]}/${m[1]}` : '#/market/all'}" class="hero-watch hw${i}">${art(br, mo)}</a>`; }).join('')}</div>
+          <div class="hero-stats">
+            <div><strong>${fmt(idx.listings)}</strong><span>real listings</span></div>
+            <div><strong>${fmt(idx.models.length)}</strong><span>models</span></div>
+            <div><strong>39,000+</strong><span>reference numbers</span></div>
+            <div><strong>${brands.length}</strong><span>luxury brands</span></div>
+          </div>
         </div></section>
         <div class="container">
         ${ad()}
@@ -203,7 +169,6 @@
       let cards = '';
       list.forEach((m, i) => {
         cards += `<a class="card mk-card" href="#/market/${bs}/${m.slug}">
-          <div class="card-img">${art(b.brand, m.model, { case: m.case, women: m.women, mvmt: m.mvmt, brace: m.refs[0] && m.refs[0].brace })}</div>
           <div class="card-body"><div class="card-brand">${esc(b.brand)}</div><div class="card-title">${esc(m.model)}</div>
             <div class="small muted">${fmt(m.listings)} listings · ${m.refCount} refs</div>${priceBlock(m)}</div></a>`;
         if ((i + 1) % 12 === 0 && i < list.length - 1) cards += '<div class="grid-ad" data-ad="300x250"></div>';
@@ -247,12 +212,10 @@
       d.rows.forEach((r) => { const c = d.cond[r[3]]; if (c) condCounts[c] = (condCounts[c] || 0) + 1; });
       const condChips = Object.entries(condCounts).map(([c, n]) => `<a class="chip chip-sm${q.cond === c ? ' active' : ''}" href="${qlink(path, q, { cond: q.cond === c ? '' : c, page: '' })}">${esc(c)} (${fmt(n)})</a>`).join('');
       const listRows = view.map((r) => `<tr><td>${esc(d.refs[r[0]] || '—')}</td><td>${esc(r[1] || '')}</td><td>${esc(r[4] || '–')}</td><td>${esc(d.cond[r[3]] || '–')}</td><td class="hide-sm">${esc([r[5], r[6]].filter(Boolean).join(' / ') || '–')}</td><td class="hide-sm">${r[9] ? esc(r[9]) + ' mm' : '–'}</td><td class="num"><strong>${usd(r[2])}</strong><div class="small muted">${inr(r[2])}</div></td></tr>`).join('');
-      const info = { case: m.case, women: m.women, mvmt: m.mvmt, brace: m.refs[0] && m.refs[0].brace };
       document.title = `${b.brand} ${m.model} Price – ${C.name}`;
       return `<div class="container">
         <div class="crumbs"><a href="#/">Home</a> / <a href="#/market/brands">Brands</a> / <a href="#/market/${bs}">${esc(b.brand)}</a> / <span>${esc(m.model)}</span></div>
         <div class="mk-model">
-          <div class="gallery-main mk-art">${art(b.brand, m.model, info)}</div>
           <div>
             <div class="card-brand">${esc(b.brand)}</div>
             <h1>${esc(b.brand)} ${esc(m.model)} Price</h1>
@@ -316,5 +279,5 @@
     location.hash = qlink(path, parseQuery(qs), { sort: e.target.value, page: '' });
   });
 
-  window.Market = { render, art };
+  window.Market = { render };
 })();

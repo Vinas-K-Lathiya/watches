@@ -21,7 +21,6 @@ python3 scripts/build-market.py <the printed folder>/Watches.csv
 | `public/js/market.js` | Watch pages: home, all models, brands, brand page, model page with all listings |
 | `public/js/app.js` | Site shell: menu, footer, about/contact/disclaimer/privacy/terms, router |
 | `public/js/ads.js` | Adsterra ad loader |
-| `public/js/watch-art.js` | Draws the watch pictures (the dataset has no photos) |
 | `scripts/build-market.py` | Builds `public/data/market/` from the Kaggle `Watches.csv` |
 
 ## 1. Put the site live on Firebase (first time)
