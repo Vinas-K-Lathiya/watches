@@ -30,6 +30,22 @@
     return cache[path];
   }
 
+  // ---------- photos (Wikimedia Commons, see scripts/fetch-images.py) ----------
+  let PH = {}, BRAND_PH = {};
+  function photos() {
+    return Promise.all([load('images.json').catch(() => ({})), load('index.json')]).then(([ph, idx]) => {
+      PH = ph;
+      BRAND_PH = {};
+      // A brand's picture is the photo of its most-listed model that has one.
+      idx.models.forEach((m) => { const p = PH[`${m[0]}/${m[1]}`]; if (p && !BRAND_PH[m[0]]) BRAND_PH[m[0]] = p; });
+    });
+  }
+  function pic(p, alt, brand) {
+    if (!p) return `<div class="card-img mk-nophoto"><span>${esc((brand || alt).split(/\s+/).map((w) => w[0]).join('').slice(0, 2))}</span></div>`;
+    return `<div class="card-img mk-photo"><img src="${esc(p.src)}" alt="${esc(alt)}" loading="lazy"></div>`;
+  }
+  const credit = (p) => p ? `<p class="small muted mk-credit">Photo: <a class="link" href="${esc(p.page)}" target="_blank" rel="noopener">${esc(p.author)}</a>, ${p.licenceUrl ? `<a class="link" href="${esc(p.licenceUrl)}" target="_blank" rel="noopener">${esc(p.licence)}</a>` : esc(p.licence)}, via Wikimedia Commons</p>` : '';
+
   // ---------- shared bits ----------
   const ad = (t) => `<div data-ad="${t || '728x90'}" class="ad-slot"></div>`;
   const loading = '<div class="mk-loading">Loading market data…</div>';
@@ -56,6 +72,7 @@
 
   function brandCard(b) {
     return `<a class="card mk-card" href="#/market/${b.slug}">
+      ${pic(BRAND_PH[b.slug], b.brand, b.brand)}
       <div class="card-body"><div class="card-title">${esc(b.brand)}</div>
         <div class="small muted">${fmt(b.listings)} listings · ${b.models} models</div>
         <div class="price-row"><span class="small muted">Typical</span><span class="price">${usd(b.med)}</span></div>
@@ -64,6 +81,7 @@
   // m = [brandSlug, modelSlug, brand, model, medianUsd, listings]
   function modelCard(m) {
     return `<a class="card mk-card" href="#/market/${m[0]}/${m[1]}">
+      ${pic(PH[`${m[0]}/${m[1]}`], `${m[2]} ${m[3]}`, m[2])}
       <div class="card-body"><div class="card-brand">${esc(m[2])}</div><div class="card-title">${esc(m[3])}</div>
         <div class="small muted">${fmt(m[5])} listings</div>
         <div class="price-row"><span class="price">${usd(m[4])}</span><span class="muted small">${inr(m[4])}</span></div></div></a>`;
@@ -105,6 +123,21 @@
         ${ad('native')}
         ${sourceNote(idx.listings)}
         </div>`;
+    });
+  }
+
+  function creditsPage() {
+    return load('index.json').then((idx) => {
+      const names = {};
+      idx.models.forEach((m) => { names[`${m[0]}/${m[1]}`] = `${m[2]} ${m[3]}`; });
+      const rows = Object.entries(PH).sort().map(([k, p]) => `<tr><td><a class="link" href="#/market/${k}">${esc(names[k] || k)}</a></td><td><a class="link" href="${esc(p.page)}" target="_blank" rel="noopener">${esc(p.title)}</a></td><td>${esc(p.author)}</td><td>${p.licenceUrl ? `<a class="link" href="${esc(p.licenceUrl)}" target="_blank" rel="noopener">${esc(p.licence)}</a>` : esc(p.licence)}</td></tr>`).join('');
+      return `<div class="container">
+        <div class="crumbs"><a href="#/">Home</a> / <span>Photo Credits</span></div>
+        <h1>Photo Credits</h1>
+        <p class="muted">All ${Object.keys(PH).length} watch photos on this site come from <a class="link" href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a> and are used under the free licences listed below. Photos show the model family and may not match every reference number exactly.</p>
+        <div class="table-wrap"><table class="mk-table"><thead><tr><th>Watch</th><th>File</th><th>Author</th><th>Licence</th></tr></thead><tbody>${rows}</tbody></table></div>
+        ${ad()}
+      </div>`;
     });
   }
 
@@ -169,6 +202,7 @@
       let cards = '';
       list.forEach((m, i) => {
         cards += `<a class="card mk-card" href="#/market/${bs}/${m.slug}">
+          ${pic(PH[`${bs}/${m.slug}`], `${b.brand} ${m.model}`, b.brand)}
           <div class="card-body"><div class="card-brand">${esc(b.brand)}</div><div class="card-title">${esc(m.model)}</div>
             <div class="small muted">${fmt(m.listings)} listings · ${m.refCount} refs</div>${priceBlock(m)}</div></a>`;
         if ((i + 1) % 12 === 0 && i < list.length - 1) cards += '<div class="grid-ad" data-ad="300x250"></div>';
@@ -215,7 +249,8 @@
       document.title = `${b.brand} ${m.model} Price – ${C.name}`;
       return `<div class="container">
         <div class="crumbs"><a href="#/">Home</a> / <a href="#/market/brands">Brands</a> / <a href="#/market/${bs}">${esc(b.brand)}</a> / <span>${esc(m.model)}</span></div>
-        <div class="mk-model">
+        <div class="mk-model${PH[path.slice(1)] ? ' has-photo' : ''}">
+          ${PH[path.slice(1)] ? `<figure class="mk-figure"><img src="${esc(PH[path.slice(1)].src)}" alt="${esc(b.brand + ' ' + m.model)}">${credit(PH[path.slice(1)])}</figure>` : ''}
           <div>
             <div class="card-brand">${esc(b.brand)}</div>
             <h1>${esc(b.brand)} ${esc(m.model)} Price</h1>
@@ -256,8 +291,8 @@
     const q = parseQuery(qs);
     const my = ++token;
     app.innerHTML = `<div class="container">${loading}</div>`;
-    const job = parts.length === 0 ? home() : parts[0] === 'brands' ? brandsPage() : parts[0] === 'all' ? allModels(q) : parts.length === 1 ? brandPage(parts[0], q) : modelPage(parts[0], parts[1], q);
-    job.then((html) => {
+    const page = () => parts.length === 0 ? home() : parts[0] === 'credits' ? creditsPage() : parts[0] === 'brands' ? brandsPage() : parts[0] === 'all' ? allModels(q) : parts.length === 1 ? brandPage(parts[0], q) : modelPage(parts[0], parts[1], q);
+    photos().then(page).then((html) => {
       if (my !== token) return;
       app.innerHTML = html;
       if (parts.length === 2 && (q.page || q.cond || q.ref || q.sort)) { const el = document.getElementById('mkListings'); if (el) el.scrollIntoView(); }
