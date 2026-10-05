@@ -38,12 +38,20 @@
 
   // ---------- photos (Wikimedia Commons, see scripts/fetch-images.py) ----------
   let PH = {}, BRAND_PH = {}, INDEX = null;
+  // Model whose photo is shown on each brand box (close-up photos of the dial).
+  const BRAND_PICK = {
+    rolex: 'daytona', omega: 'seamaster-diver-300-m', longines: 'hydroconquest', 'audemars-piguet': 'royal-oak-offshore-chronograph',
+    cartier: 'pasha', breitling: 'navitimer-1-b01-chronograph', 'patek-philippe': 'perpetual-calendar', seiko: 'alpinist',
+    iwc: 'big-pilot', tudor: 'black-bay', 'tag-heuer': 'carrera', oris: 'divers-sixty-five',
+    'jaeger-lecoultre': 'master-geographic', zenith: 'el-primero-chronomaster', 'vacheron-constantin': 'fiftysix',
+  };
   function photos() {
     return Promise.all([load('images.json').catch(() => ({})), load('index.json')]).then(([ph, idx]) => {
       PH = ph;
       BRAND_PH = {};
       idx.models.forEach((m) => { m[4] = price(m[0], m[1]); });
-      // A brand's picture is the photo of its most-listed model that has one.
+      // A brand's picture is a hand-picked clear close-up (BRAND_PICK), otherwise the photo of its most-listed model.
+      Object.entries(BRAND_PICK).forEach(([b, m]) => { if (PH[`${b}/${m}`]) BRAND_PH[b] = PH[`${b}/${m}`]; });
       idx.models.forEach((m) => { const p = PH[`${m[0]}/${m[1]}`]; if (p && !BRAND_PH[m[0]]) BRAND_PH[m[0]] = p; });
     });
   }
