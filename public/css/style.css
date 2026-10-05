@@ -385,3 +385,11 @@ button, input, select, textarea { font: inherit; }
 .adblock-box ol { text-align: left; margin: 12px auto; padding-left: 22px; max-width: 340px; color: #374151; font-size: .92rem; }
 .adblock-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
 .adblock-actions .btn-ghost { color: var(--muted); border-color: var(--line); }
+
+/* Sponsored (Smartlink) box inside grids */
+.sponsored-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; height: 100%; min-height: 300px; padding: 18px 14px; border-radius: 12px; background: linear-gradient(160deg, #0f1b2d, #24395c); color: #fff; }
+.sponsored-card strong { font-family: 'Playfair Display', Georgia, serif; font-size: 1.15rem; color: var(--gold-2); }
+.sponsored-card .sp-icon { font-size: 2rem; }
+.sponsored-card .sp-text { font-size: .85rem; color: #c7cfdb; }
+.ad-card:has(.sponsored-card) { padding: 26px 0 0; border-style: solid; background: #0f1b2d; }
+.ad-card:has(.sponsored-card) .ad-label { color: #c7cfdb; }

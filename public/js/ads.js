@@ -9,7 +9,7 @@
   const preview = /localhost|127\.0\.0\.1/.test(location.hostname) || /[?&]adpreview/.test(location.search);
   const showPlaceholders = cfg.showPlaceholders || preview;
 
-  function unit(size) { return cfg['banner' + size] || {}; }
+  function unit(size) { const u = cfg['banner' + size] || {}; return u.on === false ? {} : u; }
 
   function placeholder(el, label, w, h) {
     if (!showPlaceholders) { el.remove(); return; }
@@ -112,6 +112,18 @@
     return wanted;
   }
 
+  function sponsoredCard(el) {
+    const box = el.closest('.ad-card');
+    if (!cfg.smartlink) { (box || el).remove(); return; }
+    const a = document.createElement('a');
+    a.className = 'sponsored-card';
+    a.href = cfg.smartlink;
+    a.target = '_blank';
+    a.rel = 'sponsored nofollow noopener';
+    a.innerHTML = '<span class="sp-icon">✨</span><strong>Today\'s featured offer</strong><span class="sp-text">Tap to see a sponsored offer picked for you</span><span class="btn btn-gold btn-sm">Open offer</span>';
+    el.replaceWith(a);
+  }
+
   // Smartlink: a clearly labelled "Sponsored" link (see config.js).
   function smartlink(el) {
     if (!el) return;
@@ -125,7 +137,11 @@
       el.setAttribute('data-ad-done', '1');
       const type = el.getAttribute('data-ad');
       if (type === 'native') return native(el);
-      if (type === 'card') return banner(el, '160x300'); // ad box inside a grid of watch boxes
+      if (type === 'card') {
+        // Ad box inside a grid of watch boxes: banner if switched on, otherwise a Sponsored (Smartlink) box.
+        if (unit('160x300').key) return banner(el, '160x300');
+        return sponsoredCard(el);
+      }
       const size = fitSize(el, type);
       if (!size) return el.remove();
       banner(el, size);

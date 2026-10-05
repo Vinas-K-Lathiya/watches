@@ -77,7 +77,7 @@
   // ---------- ads inside grids ----------
   // Boxes 2, 6, 10, 14 ... (every 4th) are ad boxes the same size as a watch box,
   // and a full-width ad row follows every 10 boxes.
-  const adCard = '<div class="card ad-card"><span class="ad-label">Advertisement</span><div data-ad="card"></div></div>';
+  const adCard = '<div class="card ad-card"><span class="ad-label">Sponsored</span><div data-ad="card"></div></div>';
   function grid(cards) {
     const out = [];
     cards.forEach((c) => {
@@ -209,7 +209,7 @@
         <form class="mk-search" data-mk-filter><input name="q" type="search" placeholder="Search models…" value="${esc(q.q || '')}"><button class="btn btn-sm">Search</button></form>
         <div class="chips">${BANDS.map(([l, lo, hi]) => { const on = band && band[0] === l; return `<a class="chip chip-sm${on ? ' active' : ''}" href="${qlink('/all', q, on ? { min: '', max: '', page: '' } : { min: lo, max: hi, page: '' })}">${l}</a>`; }).join('')}</div>
         <div class="chips" style="margin-top:8px">${brands.map((b) => `<a class="chip chip-sm${q.brand === b.slug ? ' active' : ''}" href="${qlink('/all', q, { brand: q.brand === b.slug ? '' : b.slug, page: '' })}">${esc(b.brand)}</a>`).join('')}</div>
-        ${ad()}
+        ${ad('native')}
         ${view.length ? cards : `<div class="empty"><p class="muted">No models found.</p><a class="btn" href="#/market/all">Show all models</a></div>`}
         ${pager(page, pages, (n) => qlink('/all', q, { page: n }))}
         ${ad()}
@@ -243,7 +243,7 @@
           <div><span>Highest price</span><strong>${rs(Math.max(...b.models.map((m) => m.med)))}</strong></div>
         </div>
         <form class="mk-search" data-mk-filter><input name="q" type="search" placeholder="Filter ${esc(b.brand)} models or reference numbers…" value="${esc(q.q || '')}"><button class="btn btn-sm">Filter</button></form>
-        ${ad()}
+        ${ad('native')}
         ${list.length ? cards : '<div class="empty"><p class="muted">No models match.</p></div>'}
         ${pager(page, pages, (n) => qlink('/' + bs, q, { page: n }))}
         ${ad()}
