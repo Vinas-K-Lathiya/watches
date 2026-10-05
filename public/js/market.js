@@ -326,10 +326,11 @@
             ${ad('300x250')}
           </div>
         </div>
+        <div class="native-row native-slot" data-ad="native-frame"></div>
         <section class="section"><div class="section-head"><h2>Reference Numbers</h2>${m.refs.length > 60 ? `<span class="small muted">Top 60 of ${m.refs.length}</span>` : ''}</div>
           <div class="table-wrap"><table class="mk-table"><thead><tr><th>Reference</th><th>Listings</th><th>Movement</th><th class="hide-sm">Case · Size</th></tr></thead><tbody>${refRows}</tbody></table></div>
         </section>
-        ${ad()}
+        <div class="native-row native-slot" data-ad="native-frame"></div>
         <section class="section" id="mkListings"><div class="section-head"><h2>All Listings <span class="muted">(${fmt(rows.length)})</span></h2>
           <select data-mk-lsort aria-label="Sort listings">${[['', 'Default order'], ['year', 'Newest year']].map(([v, l]) => `<option value="${v}"${(q.sort || '') === v ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
           <div class="chips">${refFilter != null ? `<a class="chip chip-sm active" href="${qlink(path, q, { ref: '', page: '' })}">Ref ${esc(d.refs[refFilter] || '—')} ✕</a>` : ''}${condChips}</div>
