@@ -412,3 +412,6 @@ button, input, select, textarea { font: inherit; }
 .sponsored-strip strong { color: var(--gold-2); }
 .sponsored-strip.tall { flex-direction: column; text-align: center; max-width: 300px; padding: 22px 16px; }
 @media (max-width: 560px) { .sponsored-strip { flex-wrap: wrap; } .sponsored-strip .sp-main { flex-basis: 100%; order: 2; } .sponsored-strip .btn { order: 3; } }
+
+/* full-width native ad rows inside grids */
+.native-row { grid-column: 1 / -1; display: block; background: var(--card); border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); }

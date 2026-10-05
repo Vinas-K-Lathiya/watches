@@ -76,18 +76,27 @@
 
   // ---------- ads inside grids ----------
   // Boxes 2, 6, 10, 14 ... (every 4th) are ad boxes the same size as a watch box,
-  // and a full-width ad row follows every 10 boxes.
+  // and a full-width native ad row follows every 3 rows.
   const adCard = '<div class="card ad-card"><span class="ad-label">Sponsored</span><div data-ad="card"></div></div>';
+  // Number of watch boxes per row on this screen (matches .grid in style.css: boxes at least 220px wide).
+  function gridColumns() {
+    const w = window.innerWidth;
+    const content = w >= 1700 ? 1280 : w >= 1366 ? w - 2 * 196 - 32 : Math.min(w, 1280) - 32;
+    if (w <= 560) return 2;
+    return Math.max(1, Math.floor((content + 18) / (220 + 18)));
+  }
   function grid(cards) {
     const out = [];
     cards.forEach((c) => {
       if (out.length % 4 === 1) out.push(adCard);
       out.push(c);
     });
+    // A full-width native ad row after every 3 rows of boxes.
+    const perRows = gridColumns() * 3;
     let html = '';
     out.forEach((c, i) => {
       html += c;
-      if ((i + 1) % 10 === 0 && i < out.length - 1) html += '<div class="grid-ad" data-ad="728x90"></div>';
+      if ((i + 1) % perRows === 0 && i < out.length - 1) html += '<div class="grid-ad native-row" data-ad="native-frame"></div>';
     });
     return `<div class="grid">${html}</div>`;
   }
@@ -153,9 +162,6 @@
     return load('index.json').then((idx) => {
       const brands = withFrom(idx, idx.brands.filter((b) => b.listings >= 100));
       const models = realModels(idx);
-      const popular = models.slice().sort((x, y) => y[5] - x[5]).slice(0, 12);
-      const priciest = models.filter((m) => m[5] >= 20).sort((x, y) => y[4] - x[4]).slice(0, 8);
-      const entry = models.filter((m) => m[4] < 1800).sort((x, y) => y[5] - x[5]).slice(0, 8);
       const section = (title, link, inner) => `<section class="section"><div class="section-head"><h2>${title}</h2>${link ? `<a href="${link}" class="link">View all →</a>` : ''}</div>${inner}</section>`;
       return `<section class="hero"><div class="container hero-inner">
           <div class="hero-text">
@@ -175,13 +181,7 @@
         <div class="container">
         ${ad()}
         ${section('Browse by Brand', '#/market/brands', grid(brands.slice(0, 10).map(brandCard)))}
-        ${section('🔥 Most Listed Watches', '#/market/all?sort=popular', grid(popular.map(modelCard)))}
-        ${ad('native')}
-        ${section('Browse by Budget', '', `<div class="chips">${BANDS.map(([l, lo, hi]) => `<a class="chip" href="#/market/all?min=${lo}&max=${hi}">${l}</a>`).join('')}</div>`)}
-        ${section('👑 Top Priced Models', '#/market/all?sort=high', grid(priciest.map(modelCard)))}
-        ${ad()}
-        ${section('💰 Under ₹1,800', '#/market/all?max=1800', grid(entry.map(modelCard)))}
-        ${section(`⌚ All Watches <span class="muted">(${fmt(models.length)})</span>`, '#/market/all', endless('homeAll', models.slice().sort((x, y) => y[5] - x[5])))}
+        ${section(`⌚ All Watches <span class="muted">(${fmt(models.length)})</span>`, '', `<div id="homeAll">${grid(models.slice().sort((x, y) => y[5] - x[5]).map(modelCard))}</div>`)}
         ${sourceNote(idx.listings)}
         </div>`;
     });

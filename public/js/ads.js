@@ -124,6 +124,47 @@
     el.replaceWith(a);
   }
 
+  // Adsterra's native banner fills one fixed container id, so it works only once per page.
+  // For repeated native rows, each one is loaded in its own small frame and the frame
+  // grows to fit the ad.
+  // Native rows are built only when the visitor scrolls near them (fast pages, no unseen ads).
+  let nativeObserver = null;
+  function nativeFrame(el) {
+    if (!('IntersectionObserver' in window)) return buildNativeFrame(el);
+    if (!nativeObserver) {
+      nativeObserver = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { nativeObserver.unobserve(e.target); buildNativeFrame(e.target); } });
+      }, { rootMargin: '400px 0px' });
+    }
+    el.style.minHeight = '120px';
+    nativeObserver.observe(el);
+  }
+  function buildNativeFrame(el) {
+    el.style.minHeight = '';
+    const n = cfg.native || {};
+    if (!n.src || !n.containerId) return cfg.smartlink ? sponsoredStrip(el, 728) : el.remove();
+    const src = n.src.startsWith('//') ? 'https:' + n.src : n.src;
+    const f = document.createElement('iframe');
+    f.title = 'Advertisement';
+    f.setAttribute('frameborder', '0');
+    f.setAttribute('scrolling', 'no');
+    f.style.cssText = 'border:0;width:100%;height:260px;display:block;';
+    f.srcdoc = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;font-family:Inter,system-ui,sans-serif}</style></head><body>
+<script async="async" data-cfasync="false" src="${src}"><\/script><div id="${n.containerId}"></div></body></html>`;
+    el.innerHTML = '';
+    el.appendChild(f);
+    // Fit the frame to the ad once it has loaded (the frame is same-origin, so its height can be read).
+    let tries = 0;
+    const fit = () => {
+      try {
+        const h = f.contentDocument && f.contentDocument.body ? f.contentDocument.body.scrollHeight : 0;
+        if (h > 40) f.style.height = h + 'px';
+      } catch (e) { /* not ready yet */ }
+      if (++tries < 20) setTimeout(fit, 750);
+    };
+    f.addEventListener('load', () => setTimeout(fit, 500));
+  }
+
   // A labelled Sponsored strip (Smartlink) used where a banner is switched off.
   function sponsoredStrip(el, w) {
     el.innerHTML = `<a class="sponsored-strip${w <= 300 ? ' tall' : ''}" href="${cfg.smartlink}" target="_blank" rel="sponsored nofollow noopener">
@@ -143,6 +184,7 @@
       el.setAttribute('data-ad-done', '1');
       const type = el.getAttribute('data-ad');
       if (type === 'native') return native(el);
+      if (type === 'native-frame') return nativeFrame(el);
       if (type === 'card') {
         // Ad box inside a grid of watch boxes: banner if switched on, otherwise a Sponsored (Smartlink) box.
         return sponsoredCard(el);
