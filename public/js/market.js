@@ -1,5 +1,5 @@
 /* Luxury watch database: photos, details and real listings of the models that have a photo
- * (Chrono24, July 2023). Prices shown are display prices (₹1,500–₹2,500), not market prices.
+ * (Chrono24, July 2023). Prices shown are display prices (₹1,500–₹2,499), not market prices.
  * Data lives in data/market/ and is loaded on demand.
  * Built by scripts/build-market.py. */
 (function () {
@@ -13,13 +13,15 @@
   const fmt = (n) => Number(n).toLocaleString('en-IN');
 
   // ---------- display prices ----------
-  // Every watch shows a display price between ₹1,500 and ₹2,500, picked "at random" from its name so it
+  // Every watch shows a display price from ₹1,500 to ₹2,499, picked "at random" from its name so it
   // stays the same on every visit. These are not market prices (the site says so on every page).
-  const PRICE_MIN = 1500, PRICE_MAX = 2500;
+  // Possible prices: 1500, 1599, 1699, 1799, ... 2499.
+  const PRICES = [1500, 1599, 1699, 1799, 1899, 1999, 2099, 2199, 2299, 2399, 2499];
+  const PRICE_MIN = PRICES[0];
   function price(bs, ms) {
     let h = 2166136261;
     for (const ch of `${bs}/${ms}`) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-    return PRICE_MIN + ((h >>> 0) % ((PRICE_MAX - PRICE_MIN) / 10 + 1)) * 10;
+    return PRICES[(h >>> 0) % PRICES.length];
   }
   const rs = (n) => '₹' + fmt(n);
   const priceNote = `<p class="small muted">Display price – not a market price.</p>`;
@@ -54,7 +56,7 @@
   // ---------- shared bits ----------
   const ad = (t) => `<div data-ad="${t || '728x90'}" class="ad-slot"></div>`;
   const loading = '<div class="mk-loading">Loading market data…</div>';
-  const sourceNote = (n) => `<p class="small muted mk-source">Prices on this site are display prices between ₹1,500 and ₹2,500 set by ${esc(C.name)}; they are not market prices or offers. Model and listing details: <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> by Philmore Koung${n ? ` (${fmt(n)} listings from chrono24.com, July 2023)` : ''}.</p>`;
+  const sourceNote = (n) => `<p class="small muted mk-source">Prices on this site are display prices between ₹1,500 and ₹2,499 set by ${esc(C.name)}; they are not market prices or offers. Model and listing details: <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> by Philmore Koung${n ? ` (${fmt(n)} listings from chrono24.com, July 2023)` : ''}.</p>`;
   function parseQuery(q) { const o = {}; new URLSearchParams(q || '').forEach((v, k) => { o[k] = v; }); return o; }
   function qlink(path, q, patch) {
     const u = new URLSearchParams();
@@ -111,7 +113,7 @@
             <h1>Luxury watches,<br>real photos.</h1>
             <p>Photos, details and ${fmt(idx.listings)} real listings of ${fmt(idx.models.length)} models from ${brands.length} luxury brands – Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Tudor and more.</p>
             <form class="mk-search" data-mk-search><input name="q" type="search" placeholder="Search a model, e.g. Submariner, Nautilus, Royal Oak…" aria-label="Search models"><button class="btn btn-gold">Search</button></form>
-            <div class="hero-trust"><span>✔ ${fmt(idx.listings)} listings</span><span>✔ Real photos</span><span>✔ Display prices ₹1,500–₹2,500</span></div>
+            <div class="hero-trust"><span>✔ ${fmt(idx.listings)} listings</span><span>✔ Real photos</span><span>✔ Display prices ₹1,500–₹2,499</span></div>
           </div>
           <div class="hero-stats">
             <div><strong>${fmt(idx.listings)}</strong><span>real listings</span></div>

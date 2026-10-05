@@ -9,7 +9,7 @@
   function about() {
     return `<div class="container narrow prose"><h1>About ${esc(C.name)}</h1>
       <p>${esc(C.name)} is a free luxury watch website with real photos and details of 212 models from Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Tudor and other luxury brands, plus 1.3 lakh+ real listings.</p>
-      <p>Prices shown on this site are display prices between ₹1,500 and ₹2,500. They are not market prices and not offers – we do not sell watches. Model and listing details come from the <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> (chrono24.com, July 2023).</p>
+      <p>Prices shown on this site are display prices between ₹1,500 and ₹2,499. They are not market prices and not offers – we do not sell watches. Model and listing details come from the <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> (chrono24.com, July 2023).</p>
       <div data-ad="728x90" class="ad-slot"></div></div>`;
   }
 
@@ -21,7 +21,7 @@
   }
 
   const PAGES = {
-    disclaimer: ['Disclaimer', `<p>${esc(C.name)} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by any watch brand, retailer or marketplace mentioned. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p><strong>Prices on this site are display prices between ₹1,500 and ₹2,500 chosen by us. They are not the real market price of any watch, not offers, and must not be relied on.</strong> Real luxury watches from these brands usually cost far more.</p><p>Watch photos come from Wikimedia Commons under free licences (see Photo Credits). They show the model family and may not match every reference number, dial or year listed.</p>`],
+    disclaimer: ['Disclaimer', `<p>${esc(C.name)} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by any watch brand, retailer or marketplace mentioned. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p><strong>Prices on this site are display prices between ₹1,500 and ₹2,499 chosen by us. They are not the real market price of any watch, not offers, and must not be relied on.</strong> Real luxury watches from these brands usually cost far more.</p><p>Watch photos come from Wikimedia Commons under free licences (see Photo Credits). They show the model family and may not match every reference number, dial or year listed.</p>`],
     privacy: ['Privacy Policy', `<p>We do not require you to create an account and we do not collect personal information.</p><p><strong>Advertising:</strong> This website shows ads served by third-party networks such as Adsterra. These partners may use cookies or similar technologies to show relevant ads and measure performance. You can control cookies through your browser settings.</p><p>For any privacy questions, contact ${esc(C.email)}.</p>`],
     terms: ['Terms of Use', '<p>By using this website you agree to these terms. All information is provided "as is" for general information only. Prices shown are display prices, not market prices. We make no guarantee that specifications are complete or current. We are not responsible for any purchase decision made based on this website.</p>'],
   };
