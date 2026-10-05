@@ -5,7 +5,7 @@
  * inside its own small iframe. */
 (function () {
   const cfg = (window.STORE_CONFIG && window.STORE_CONFIG.ads) || {};
-  const SIZES = { '728x90': [728, 90], '468x60': [468, 60], '300x250': [300, 250], '320x50': [320, 50], '160x600': [160, 600] };
+  const SIZES = { '728x90': [728, 90], '468x60': [468, 60], '300x250': [300, 250], '320x50': [320, 50], '160x600': [160, 600], '160x300': [160, 300] };
   const preview = /localhost|127\.0\.0\.1/.test(location.hostname) || /[?&]adpreview/.test(location.search);
   const showPlaceholders = cfg.showPlaceholders || preview;
 
@@ -20,7 +20,7 @@
     const [w, h] = SIZES[size];
     const u = unit(size);
     if (!u.key) return placeholder(el, `Adsterra ${size}`, w, h);
-    const domain = (u.domain || 'www.highperformanceformat.com').replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const domain = (u.domain || 'www.highrevenueformat.com').replace(/^https?:\/\//, '').replace(/\/$/, '');
     const html = `<!doctype html><html><head><style>html,body{margin:0;padding:0;overflow:hidden;background:transparent}</style></head><body>
 <script type="text/javascript">atOptions={'key':'${u.key}','format':'iframe','height':${h},'width':${w},'params':{}};<\/script>
 <script type="text/javascript" src="https://${domain}/${u.key}/invoke.js"><\/script></body></html>`;
@@ -63,8 +63,16 @@
       if (unit('300x250').key) return '300x250';
       return width >= 740 ? '728x90' : '320x50';
     }
-    if (wanted === '160x600' && window.innerWidth < 1100) return null;
+    // Side rails are only visible on very wide screens (see .ad-rail in style.css); never load hidden ads.
+    if ((wanted === '160x600' || wanted === '160x300') && window.innerWidth < 1660) return null;
     return wanted;
+  }
+
+  // Smartlink: a clearly labelled "Sponsored" link (see config.js).
+  function smartlink(el) {
+    if (!el) return;
+    if (!cfg.enabled || !cfg.smartlink) { el.remove(); return; }
+    el.innerHTML = `<a href="${cfg.smartlink}" target="_blank" rel="sponsored nofollow noopener">Sponsored</a>`;
   }
 
   function render(root) {
@@ -85,6 +93,7 @@
     started = true;
     globalScript((cfg.socialBar || {}).src);
     globalScript((cfg.popunder || {}).src);
+    smartlink(document.getElementById('smartlink'));
   }
 
   window.Ads = { render, initGlobal };

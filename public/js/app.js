@@ -89,6 +89,8 @@
     window.addEventListener('hashchange', route);
     route();
     Ads.initGlobal();
+    // Ad slots outside the page content (footer, side rails).
+    Ads.render(document);
   }
   boot();
 })();
