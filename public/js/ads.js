@@ -45,12 +45,56 @@
     el.appendChild(s);
   }
 
+  let scriptBlocked = false;
   function globalScript(src) {
     if (!src) return;
     const s = document.createElement('script');
     s.type = 'text/javascript';
     s.src = src.startsWith('//') ? 'https:' + src : src;
+    s.onerror = () => { scriptBlocked = true; };
     document.body.appendChild(s);
+  }
+
+  // ---------- adblock detection ----------
+  // Two checks: a "bait" element with ad-like class names (hidden by blockers),
+  // and whether the Adsterra scripts failed to load. If either trips, show a
+  // polite message asking the visitor to allow ads. It can be closed.
+  function detectAdblock() {
+    const bait = document.createElement('div');
+    bait.className = 'adsbox ad-banner ad-unit adsbygoogle pub_300x250 textads banner-ads';
+    bait.setAttribute('aria-hidden', 'true');
+    bait.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:2px;height:2px;';
+    bait.innerHTML = '&nbsp;';
+    document.body.appendChild(bait);
+    setTimeout(() => {
+      const hidden = !bait.offsetHeight || getComputedStyle(bait).display === 'none' || getComputedStyle(bait).visibility === 'hidden';
+      bait.remove();
+      if (hidden || scriptBlocked) showAdblockNotice();
+    }, 2500);
+  }
+
+  function showAdblockNotice() {
+    try { if (sessionStorage.getItem('adblockNoticeClosed')) return; } catch (e) { /* storage unavailable */ }
+    if (document.getElementById('adblockNotice')) return;
+    const box = document.createElement('div');
+    box.id = 'adblockNotice';
+    box.className = 'adblock-notice';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-labelledby', 'adblockTitle');
+    box.innerHTML = `<div class="adblock-box">
+      <div class="adblock-icon">🛡️</div>
+      <h2 id="adblockTitle">Ad blocker detected</h2>
+      <p>This website is free and is kept running by ads. Please turn off your ad blocker or allow ads for this site, then reload the page.</p>
+      <ol><li>Click your ad blocker's icon in the browser toolbar</li><li>Choose <strong>"Pause on this site"</strong> or <strong>"Don't run on this site"</strong></li><li>Reload the page</li></ol>
+      <div class="adblock-actions"><button class="btn btn-gold" data-adblock-reload>I've allowed ads – Reload</button><button class="btn btn-ghost" data-adblock-close>Continue anyway</button></div>
+    </div>`;
+    document.body.appendChild(box);
+    box.querySelector('[data-adblock-reload]').addEventListener('click', () => location.reload());
+    box.querySelector('[data-adblock-close]').addEventListener('click', () => {
+      box.remove();
+      try { sessionStorage.setItem('adblockNoticeClosed', '1'); } catch (e) { /* storage unavailable */ }
+    });
   }
 
   // Picks a banner size that fits the slot's width (mobile gets smaller ads).
@@ -95,7 +139,8 @@
     globalScript((cfg.socialBar || {}).src);
     globalScript((cfg.popunder || {}).src);
     smartlink(document.getElementById('smartlink'));
+    detectAdblock();
   }
 
-  window.Ads = { render, initGlobal };
+  window.Ads = { render, initGlobal, showAdblockNotice };
 })();

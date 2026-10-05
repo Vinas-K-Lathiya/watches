@@ -375,3 +375,13 @@ button, input, select, textarea { font: inherit; }
 .ad-card:hover { transform: none; box-shadow: none; }
 .ad-card .ad-label { position: absolute; top: 8px; left: 0; right: 0; text-align: center; font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .ad-card .ad-placeholder { height: 300px !important; max-width: 160px !important; }
+
+/* adblock notice */
+.adblock-notice { position: fixed; inset: 0; z-index: 200; background: rgba(10, 18, 30, .72); display: grid; place-items: center; padding: 16px; }
+.adblock-box { background: #fff; color: var(--ink); border-radius: 18px; max-width: 460px; width: 100%; padding: 28px 24px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+.adblock-icon { font-size: 2.4rem; }
+.adblock-box h2 { margin: 8px 0; font-size: 1.5rem; }
+.adblock-box p { color: #374151; }
+.adblock-box ol { text-align: left; margin: 12px auto; padding-left: 22px; max-width: 340px; color: #374151; font-size: .92rem; }
+.adblock-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.adblock-actions .btn-ghost { color: var(--muted); border-color: var(--line); }

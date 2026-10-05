@@ -75,13 +75,13 @@
   const priceBlock = (n) => `<div class="price-row"><span class="price">${rs(n)}</span></div>`;
 
   // ---------- ads inside grids ----------
-  // Boxes 2, 5, 8, 11 ... are ad boxes the same size as a watch box,
+  // Boxes 2, 6, 10, 14 ... (every 4th) are ad boxes the same size as a watch box,
   // and a full-width ad row follows every 10 boxes.
   const adCard = '<div class="card ad-card"><span class="ad-label">Advertisement</span><div data-ad="card"></div></div>';
   function grid(cards) {
     const out = [];
     cards.forEach((c) => {
-      if (out.length % 3 === 1) out.push(adCard);
+      if (out.length % 4 === 1) out.push(adCard);
       out.push(c);
     });
     let html = '';
