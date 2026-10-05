@@ -19,36 +19,32 @@ GENERIC = {'date', 'watch', 'watches', 'automatic', 'chronograph', 'quartz', 'la
            'small', 'large', 'mini', 'new', 'vintage', 'edition', 'limited', 'sport', 'sports', 'professional'}
 BAD = ('caseback', 'case back', 'back of', 'display', 'collection', 'dealer', 'window', 'watches', 'exhibit', 'auction',
        'wristwatches', 'various', 'group', 'several', 'set of', 'detail', 'sub dials', 'sub-dials', 'dial of')
-# "brandSlug/modelSlug" pairs checked by eye and found to show the wrong watch.
-EXCLUDE = {
-    'a-lange-s-hne/double-split',
-    'a-lange-s-hne/grand-langematik',
-    'a-lange-s-hne/lange-1',
-    'a-lange-s-hne/lange-31',
-    'a-lange-s-hne/richard-lange',
-    'breitling/top-time',
-    'breitling/wings-lady',
-    'cartier/cl-de-cartier',
-    'cartier/panth-re',
-    'longines/dolcevita',
-    'longines/saint-imier',
-    'longines/symphonette',
-    'omega/speedmaster',
-    'omega/speedmaster-date',
-    'oris/chronoris',
-    'patek-philippe/minute-repeater',
-    'patek-philippe/nautilus',
-    'rolex/day-date-36',
-    'rolex/day-date-40',
-    'sinn/ezm-13',
-    'sinn/ezm-3',
-    'tag-heuer/monaco',
-    'tag-heuer/monaco-lady',
-    'tudor/royal',
-    'tudor/style',
-    'vacheron-constantin/overseas',
-    'vacheron-constantin/overseas-chronograph',
-    'zenith/pilot',
+# Photo files checked by eye and found to show the wrong thing (buildings, people, planes, coins, ...).
+BAD_FILES = {
+    "https://commons.wikimedia.org/wiki/File:A._Lange_%26_S%C3%B6hne_Stammhaus,_Glash%C3%BCtte_(3).jpg",
+    "https://commons.wikimedia.org/wiki/File:A_tudor_style_villa_-_panoramio.jpg",
+    "https://commons.wikimedia.org/wiki/File:Aishwarya_Rai_Bachchan_at_the_launch_of_Longines_Dolcevita.jpg",
+    "https://commons.wikimedia.org/wiki/File:Cartier_Panth%C3%A8re_Ruban.jpg",
+    "https://commons.wikimedia.org/wiki/File:Decorazione_del_fondello_del_Vacheron_Constantin_Overseas_prima_generazione,_fine_anni_Novanta.jpg",
+    "https://commons.wikimedia.org/wiki/File:Lange_%26_S%C3%B6hne_01.jpg",
+    "https://commons.wikimedia.org/wiki/File:Longines_Saint-Imier_02_12.jpg",
+    "https://commons.wikimedia.org/wiki/File:Members_of_the_Breitling_Wingwalkers_stand_on_top_of_their_Stearman_Model_75_biplanes_during_a_demonstration_at_the_Farnborough_International_Airshow_2012_in_Farnborough,_United_Kingdom,_July_15,_2012_120715-F-RP755-314.jpg",
+    "https://commons.wikimedia.org/wiki/File:Mother_Mary_Lange_Catholic_School_Grand_Opening_(51362221335).jpg",
+    "https://commons.wikimedia.org/wiki/File:Omega_Speedmaster_Schumacher_Edition_.jpeg",
+    "https://commons.wikimedia.org/wiki/File:Omega_speedmaster_reduced_351050.jpg",
+    "https://commons.wikimedia.org/wiki/File:On_Breitling_wings_(6064349783).jpg",
+    "https://commons.wikimedia.org/wiki/File:Oris_Chronoris,_Referenz_01_672_7564_4154.jpg",
+    "https://commons.wikimedia.org/wiki/File:Parc_national_de_la_Jacques-Cartier,_Quebec,_Canada_22.jpg",
+    "https://commons.wikimedia.org/wiki/File:Patek-Philippe-Nautilus-5711.jpg",
+    "https://commons.wikimedia.org/wiki/File:Patek_Philippe_Minute_Repeater_Split_Seconds_Chronograph,_Geneva,_Switzerland,_c._1895_-_Franklin_Institute_-_DSC06644.jpg",
+    "https://commons.wikimedia.org/wiki/File:Patent_Drawing_for_K._Lange%27s_Double_Bicycle_for_Looping_the_Loop_-_NARA_-_5928301.jpg",
+    "https://commons.wikimedia.org/wiki/File:Richard_Lange_-grave.jpg",
+    "https://commons.wikimedia.org/wiki/File:Rolex_Day-Date_Lacquered_Stella_Dial.jpg",
+    "https://commons.wikimedia.org/wiki/File:Royal_Tudor_Ware_gravy_boat_-_2023-05-04_-_Andy_Mabbett_-_01.jpg",
+    "https://commons.wikimedia.org/wiki/File:TAG_Heuer_Monaco_40th_Anniversary_re-edition.JPG",
+    "https://commons.wikimedia.org/wiki/File:TESTAF-Sinn_EZM10_EZM9_857LHC.JPG",
+    "https://commons.wikimedia.org/wiki/File:Texas_Instruments_Longines_Symphonette_Calculator_1st_version.jpg",
+    "https://commons.wikimedia.org/wiki/File:The_balloon_Zenith_piloted_by_Gaston_and_Albert_Tissandier.jpg",
 }
 
 
@@ -68,14 +64,15 @@ def main():
 
     for key in list(credits):
         title = norm(credits[key]['title'])
-        if key in EXCLUDE or key not in names or any(b in title for b in BAD):
+        if credits[key]['page'] in BAD_FILES or key not in names or any(b in title for b in BAD):
             del credits[key]
 
     by_file = defaultdict(list)
     for key, c in credits.items():
         by_file[c['page']].append(key)
     for page, keys in by_file.items():
-        if len(keys) == 1:
+        # A model family's Wikipedia photo may cover its close variants (e.g. Day-Date 36 and 40).
+        if len(keys) == 1 or all(credits[k].get('via') == 'wikipedia' for k in keys):
             continue
         title = norm(credits[keys[0]]['title'])
         full = [k for k in keys if all(w in title for w in key_words(names[k][0]))]
