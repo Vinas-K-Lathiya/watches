@@ -415,3 +415,6 @@ button, input, select, textarea { font: inherit; }
 
 /* full-width native ad rows inside grids */
 .native-row { grid-column: 1 / -1; display: block; background: var(--card); border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); }
+
+/* native ad rows outside grids (top of pages, before sections) */
+.native-slot { max-width: 100%; margin: 20px 0; }

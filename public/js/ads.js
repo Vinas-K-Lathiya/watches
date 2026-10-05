@@ -19,7 +19,11 @@
   function banner(el, size) {
     const [w, h] = SIZES[size];
     const u = unit(size);
-    if (!u.key) return cfg.smartlink ? sponsoredStrip(el, w) : placeholder(el, `Adsterra ${size}`, w, h);
+    // Switched-off banner space: show a native ad row instead (or a Sponsored strip if native isn't set up).
+    if (!u.key) {
+      if ((cfg.native || {}).src && w >= 300) { el.classList.add('native-row', 'native-slot'); return nativeFrame(el); }
+      return cfg.smartlink ? sponsoredStrip(el, w) : placeholder(el, `Adsterra ${size}`, w, h);
+    }
     const domain = (u.domain || 'www.highrevenueformat.com').replace(/^https?:\/\//, '').replace(/\/$/, '');
     const html = `<!doctype html><html><head><style>html,body{margin:0;padding:0;overflow:hidden;background:transparent}</style></head><body>
 <script type="text/javascript">atOptions={'key':'${u.key}','format':'iframe','height':${h},'width':${w},'params':{}};<\/script>

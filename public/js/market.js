@@ -181,6 +181,7 @@
         <div class="container">
         ${ad()}
         ${section('Browse by Brand', '#/market/brands', grid(brands.slice(0, 10).map(brandCard)))}
+        <div class="native-row native-slot" data-ad="native-frame"></div>
         ${section(`⌚ All Watches <span class="muted">(${fmt(models.length)})</span>`, '', `<div id="homeAll">${grid(models.slice().sort((x, y) => y[5] - x[5]).map(modelCard))}</div>`)}
         ${sourceNote(idx.listings)}
         </div>`;
