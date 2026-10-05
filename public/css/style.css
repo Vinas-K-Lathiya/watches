@@ -369,3 +369,9 @@ button, input, select, textarea { font: inherit; }
 .ad-rail-l { left: calc(50% - 640px - 180px); }
 .ad-rail-r { right: calc(50% - 640px - 180px); }
 @media (min-width: 1660px) { .ad-rail { display: block; } }
+
+/* ad boxes inside grids (same size as a watch box) */
+.ad-card { align-items: center; justify-content: center; min-height: 340px; padding: 26px 8px 12px; background: #fbfaf6; border: 1px dashed #e4dfd2; box-shadow: none; position: relative; }
+.ad-card:hover { transform: none; box-shadow: none; }
+.ad-card .ad-label { position: absolute; top: 8px; left: 0; right: 0; text-align: center; font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.ad-card .ad-placeholder { height: 300px !important; max-width: 160px !important; }

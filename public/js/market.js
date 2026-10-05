@@ -74,6 +74,24 @@
   }
   const priceBlock = (n) => `<div class="price-row"><span class="price">${rs(n)}</span></div>`;
 
+  // ---------- ads inside grids ----------
+  // Boxes 2, 5, 8, 11 ... are ad boxes the same size as a watch box,
+  // and a full-width ad row follows every 10 boxes.
+  const adCard = '<div class="card ad-card"><span class="ad-label">Advertisement</span><div data-ad="card"></div></div>';
+  function grid(cards) {
+    const out = [];
+    cards.forEach((c) => {
+      if (out.length % 3 === 1) out.push(adCard);
+      out.push(c);
+    });
+    let html = '';
+    out.forEach((c, i) => {
+      html += c;
+      if ((i + 1) % 10 === 0 && i < out.length - 1) html += '<div class="grid-ad" data-ad="728x90"></div>';
+    });
+    return `<div class="grid">${html}</div>`;
+  }
+
   // ---------- pages ----------
   const BANDS = [['Under ₹1,800', 0, 1800], ['₹1,800 – ₹2,200', 1800, 2200], ['₹2,200 & above', 2200, '']];
 
@@ -124,13 +142,13 @@
         </div></section>
         <div class="container">
         ${ad()}
-        ${section('Browse by Brand', '#/market/brands', `<div class="grid">${brands.slice(0, 10).map(brandCard).join('')}</div>`)}
-        ${section('🔥 Most Listed Watches', '#/market/all?sort=popular', `<div class="grid">${popular.map(modelCard).join('')}</div>`)}
+        ${section('Browse by Brand', '#/market/brands', grid(brands.slice(0, 10).map(brandCard)))}
+        ${section('🔥 Most Listed Watches', '#/market/all?sort=popular', grid(popular.map(modelCard)))}
         ${ad('native')}
         ${section('Browse by Budget', '', `<div class="chips">${BANDS.map(([l, lo, hi]) => `<a class="chip" href="#/market/all?min=${lo}&max=${hi}">${l}</a>`).join('')}</div>`)}
-        ${section('👑 Top Priced Models', '#/market/all?sort=high', `<div class="grid">${priciest.map(modelCard).join('')}</div>`)}
+        ${section('👑 Top Priced Models', '#/market/all?sort=high', grid(priciest.map(modelCard)))}
         ${ad()}
-        ${section('💰 Under ₹1,800', '#/market/all?max=1800', `<div class="grid">${entry.map(modelCard).join('')}</div>`)}
+        ${section('💰 Under ₹1,800', '#/market/all?max=1800', grid(entry.map(modelCard)))}
         ${ad('native')}
         ${sourceNote(idx.listings)}
         </div>`;
@@ -160,7 +178,7 @@
         <div class="crumbs"><a href="#/">Home</a> / <span>All Brands</span></div>
         <h1>All Watch Brands <span class="muted">(${main.length})</span></h1>
         ${ad()}
-        <div class="grid">${withFrom(idx, main).map(brandCard).join('')}</div>
+        ${grid(withFrom(idx, main).map(brandCard))}
         ${others.length ? `<p class="small muted" style="margin-top:14px">Also in the data, with only a few listings: ${others.map((b) => `<a class="link" href="#/market/${b.slug}">${esc(b.brand)}</a>`).join(', ')}.</p>` : ''}
         ${ad('native')}
         ${sourceNote(idx.listings)}
@@ -180,8 +198,7 @@
       const page = Math.max(1, +q.page || 1);
       const pages = Math.max(1, Math.ceil(list.length / PER_PAGE_MODELS));
       const view = list.slice((page - 1) * PER_PAGE_MODELS, page * PER_PAGE_MODELS);
-      let cards = '';
-      view.forEach((m, i) => { cards += modelCard(m); if ((i + 1) % 12 === 0 && i < view.length - 1) cards += '<div class="grid-ad" data-ad="300x250"></div>'; });
+      const cards = grid(view.map(modelCard));
       const band = BANDS.find(([, lo, hi]) => String(lo) === (q.min || '0') && String(hi) === (q.max || ''));
       const title = q.q ? `Results for “${esc(q.q)}”` : band ? `Luxury Watches ${band[0]}` : q.max ? `Luxury Watches Under ₹${fmt(q.max)}` : q.sort === 'high' ? 'Top Priced Watch Models' : 'All Watch Models';
       const brands = idx.brands.filter((b) => b.listings >= 100);
@@ -193,7 +210,7 @@
         <div class="chips">${BANDS.map(([l, lo, hi]) => { const on = band && band[0] === l; return `<a class="chip chip-sm${on ? ' active' : ''}" href="${qlink('/all', q, on ? { min: '', max: '', page: '' } : { min: lo, max: hi, page: '' })}">${l}</a>`; }).join('')}</div>
         <div class="chips" style="margin-top:8px">${brands.map((b) => `<a class="chip chip-sm${q.brand === b.slug ? ' active' : ''}" href="${qlink('/all', q, { brand: q.brand === b.slug ? '' : b.slug, page: '' })}">${esc(b.brand)}</a>`).join('')}</div>
         ${ad()}
-        ${view.length ? `<div class="grid">${cards}</div>` : `<div class="empty"><p class="muted">No models found.</p><a class="btn" href="#/market/all">Show all models</a></div>`}
+        ${view.length ? cards : `<div class="empty"><p class="muted">No models found.</p><a class="btn" href="#/market/all">Show all models</a></div>`}
         ${pager(page, pages, (n) => qlink('/all', q, { page: n }))}
         ${ad()}
         ${sourceNote(idx.listings)}
@@ -211,14 +228,10 @@
       const page = Math.max(1, +q.page || 1);
       const pages = Math.max(1, Math.ceil(models.length / PER_PAGE_MODELS));
       const list = models.slice((page - 1) * PER_PAGE_MODELS, page * PER_PAGE_MODELS);
-      let cards = '';
-      list.forEach((m, i) => {
-        cards += `<a class="card mk-card" href="#/market/${bs}/${m.slug}">
+      const cards = grid(list.map((m) => `<a class="card mk-card" href="#/market/${bs}/${m.slug}">
           ${pic(PH[`${bs}/${m.slug}`], `${b.brand} ${m.model}`, b.brand)}
           <div class="card-body"><div class="card-brand">${esc(b.brand)}</div><div class="card-title">${esc(m.model)}</div>
-            <div class="small muted">${fmt(m.listings)} listings · ${m.refCount} refs</div>${priceBlock(m.med)}</div></a>`;
-        if ((i + 1) % 12 === 0 && i < list.length - 1) cards += '<div class="grid-ad" data-ad="300x250"></div>';
-      });
+            <div class="small muted">${fmt(m.listings)} listings · ${m.refCount} refs</div>${priceBlock(m.med)}</div></a>`));
       return `<div class="container">
         <div class="crumbs"><a href="#/">Home</a> / <a href="#/market/brands">Brands</a> / <span>${esc(b.brand)}</span></div>
         <div class="shop-bar"><h1>${esc(b.brand)} Watch Prices <span class="muted">(${b.models.length} models)</span></h1>
@@ -231,7 +244,7 @@
         </div>
         <form class="mk-search" data-mk-filter><input name="q" type="search" placeholder="Filter ${esc(b.brand)} models or reference numbers…" value="${esc(q.q || '')}"><button class="btn btn-sm">Filter</button></form>
         ${ad()}
-        ${list.length ? `<div class="grid">${cards}</div>` : '<div class="empty"><p class="muted">No models match.</p></div>'}
+        ${list.length ? cards : '<div class="empty"><p class="muted">No models match.</p></div>'}
         ${pager(page, pages, (n) => qlink('/' + bs, q, { page: n }))}
         ${ad()}
         ${sourceNote(b.listings)}

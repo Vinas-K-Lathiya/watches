@@ -81,6 +81,7 @@
       el.setAttribute('data-ad-done', '1');
       const type = el.getAttribute('data-ad');
       if (type === 'native') return native(el);
+      if (type === 'card') return banner(el, '160x300'); // ad box inside a grid of watch boxes
       const size = fitSize(el, type);
       if (!size) return el.remove();
       banner(el, size);
