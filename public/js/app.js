@@ -8,7 +8,7 @@
 
   function about() {
     return `<div class="container narrow prose"><h1>About ${esc(C.name)}</h1>
-      <p>${esc(C.name)} is a free luxury watch price database. It covers 2.7 lakh+ real listings of 1,000 models from Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Richard Mille and other luxury brands, with prices by model and reference number.</p>
+      <p>${esc(C.name)} is a free luxury watch price database. It covers 1.3 lakh+ real listings of 212 models, each with a real photo, from Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Tudor and other luxury brands, with prices by model and reference number.</p>
       <p>The data comes from the <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> by Philmore Koung, which collected asking prices from chrono24.com in July 2023. Prices are in US dollars with an approximate rupee value.</p>
       <div data-ad="728x90" class="ad-slot"></div></div>`;
   }
@@ -81,7 +81,7 @@
     document.querySelectorAll('#storeName, .js-store-name').forEach((el) => { el.textContent = C.name; });
     $('#year').textContent = new Date().getFullYear();
     $('#footerTagline').textContent = C.tagline;
-    const top = [['rolex', 'Rolex'], ['omega', 'Omega'], ['patek-philippe', 'Patek Philippe'], ['audemars-piguet', 'Audemars Piguet'], ['cartier', 'Cartier'], ['richard-mille', 'Richard Mille'], ['tag-heuer', 'TAG Heuer'], ['breitling', 'Breitling'], ['hublot', 'Hublot']];
+    const top = [['rolex', 'Rolex'], ['omega', 'Omega'], ['patek-philippe', 'Patek Philippe'], ['audemars-piguet', 'Audemars Piguet'], ['cartier', 'Cartier'], ['tag-heuer', 'TAG Heuer'], ['breitling', 'Breitling'], ['tudor', 'Tudor'], ['iwc', 'IWC']];
     $('#navLinks').innerHTML = '<a href="#/">Home</a><a href="#/market/all">All Models</a>' + top.map(([s, n]) => `<a href="#/market/${s}">${n}</a>`).join('') + '<a href="#/market/brands">All Brands</a>';
     $('#footerBrands').innerHTML = top.map(([s, n]) => `<li><a href="#/market/${s}">${n} Prices</a></li>`).join('');
     $('#footerLinks').innerHTML = [['#/market/all?sort=popular', 'Most Listed Models'], ['#/market/all?sort=high', 'Most Expensive Watches'], ['#/market/all?max=5000', 'Luxury Under $5,000'], ['#/market/brands', 'All Brands'], ['#/market/credits', 'Photo Credits']].map(([h, n]) => `<li><a href="${h}">${n}</a></li>`).join('');

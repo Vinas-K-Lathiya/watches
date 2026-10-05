@@ -2,6 +2,8 @@
 
 A luxury watch price website that earns money from **Adsterra ads**. It is built on the [Luxury Watch Listings dataset](https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings) by Philmore Koung: 284,491 asking-price listings scraped from chrono24.com in July 2023. After removing exact duplicates the site has **272,918 listings** of **1,000 models** and 39,000+ reference numbers from 29 brands (Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Richard Mille, ...). Prices are in US dollars with an approximate rupee value (`usdToInr` in `config.js`).
 
+Only models that have a real photo are kept: after the photo steps, `scripts/prune-no-photo.py` removes the others. The live site has **212 models, 134,130 listings and 15 brands**.
+
 It's a plain HTML/CSS/JS site with no build step, hosted on **Firebase Hosting**. The data is split into small JSON files in `public/data/market/` that the browser loads only when a page needs them.
 
 ## Rebuilding the data
@@ -18,8 +20,12 @@ Watch photos come from **Wikimedia Commons** under free licences (CC BY, CC BY-S
 
 ```bash
 python3 scripts/fetch-images.py    # search Commons and download photos
-python3 scripts/clean-images.py    # remove mismatched/reused photos (edit EXCLUDE to drop more)
+python3 scripts/fetch-images.py --more   # more photos: by reference number and Wikipedia
+python3 scripts/clean-images.py    # remove mismatched/reused photos (edit BAD_FILES to drop more)
+python3 scripts/prune-no-photo.py  # remove models that still have no photo
 ```
+
+Wikimedia rate-limits busy connections; if the scripts get "too many requests", wait a few hours and run them again (they continue where they stopped).
 
 ## Folder layout
 

@@ -1,4 +1,4 @@
-/* Luxury watch price database: 272,918 real listings of 1,000 models
+/* Luxury watch price database: real listings of the models that have a photo
  * (Chrono24, July 2023). Data lives in data/market/ and is loaded on demand.
  * Built by scripts/build-market.py. */
 (function () {
@@ -100,14 +100,14 @@
           <div class="hero-text">
             <span class="eyebrow">Luxury Watch Price Database</span>
             <h1>Real prices of<br>luxury watches.</h1>
-            <p>${fmt(idx.listings)} real listings of ${fmt(idx.models.length)} models from ${brands.length} luxury brands – Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Richard Mille and more.</p>
+            <p>${fmt(idx.listings)} real listings of ${fmt(idx.models.length)} models from ${brands.length} luxury brands – Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Tudor and more.</p>
             <form class="mk-search" data-mk-search><input name="q" type="search" placeholder="Search a model, e.g. Submariner, Nautilus, Royal Oak…" aria-label="Search models"><button class="btn btn-gold">Search</button></form>
-            <div class="hero-trust"><span>✔ ${fmt(idx.listings)} listings</span><span>✔ 39,000+ reference numbers</span><span>✔ Prices in $ and ₹</span></div>
+            <div class="hero-trust"><span>✔ ${fmt(idx.listings)} listings</span><span>✔ Real photos</span><span>✔ Prices in $ and ₹</span></div>
           </div>
           <div class="hero-stats">
             <div><strong>${fmt(idx.listings)}</strong><span>real listings</span></div>
             <div><strong>${fmt(idx.models.length)}</strong><span>models</span></div>
-            <div><strong>39,000+</strong><span>reference numbers</span></div>
+            <div><strong>${fmt(Object.keys(PH).length)}</strong><span>real photos</span></div>
             <div><strong>${brands.length}</strong><span>luxury brands</span></div>
           </div>
         </div></section>
