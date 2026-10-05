@@ -37,7 +37,7 @@
   }
 
   // ---------- photos (Wikimedia Commons, see scripts/fetch-images.py) ----------
-  let PH = {}, BRAND_PH = {};
+  let PH = {}, BRAND_PH = {}, INDEX = null;
   function photos() {
     return Promise.all([load('images.json').catch(() => ({})), load('index.json')]).then(([ph, idx]) => {
       PH = ph;
@@ -90,6 +90,38 @@
       if ((i + 1) % 10 === 0 && i < out.length - 1) html += '<div class="grid-ad" data-ad="728x90"></div>';
     });
     return `<div class="grid">${html}</div>`;
+  }
+
+  // ---------- endless lists ----------
+  // Shows the first batch right away and adds the next batch each time the visitor
+  // scrolls near the end, until every watch is shown.
+  const BATCH = 24;
+  let afterRender = null;
+  function endless(id, models) {
+    afterRender = () => {
+      const box = document.getElementById(id);
+      if (!box) return;
+      let shown = 0;
+      const sentinel = document.createElement('div');
+      sentinel.className = 'mk-more';
+      box.after(sentinel);
+      const more = () => {
+        box.insertAdjacentHTML('beforeend', grid(models.slice(shown, shown + BATCH).map(modelCard)));
+        shown += BATCH;
+        Ads.render(box);
+        sentinel.textContent = `Showing ${Math.min(shown, models.length)} of ${models.length} – scroll for more`;
+      };
+      // Load the next batch whenever the end of the list is within 600px of the screen.
+      const check = () => {
+        if (!document.body.contains(box)) { window.removeEventListener('scroll', check); return; }
+        if (shown >= models.length) { sentinel.remove(); window.removeEventListener('scroll', check); return; }
+        if (sentinel.getBoundingClientRect().top < window.innerHeight + 600) { more(); setTimeout(check, 50); }
+      };
+      more();
+      window.addEventListener('scroll', check, { passive: true });
+      setTimeout(check, 50);
+    };
+    return `<div id="${id}" class="mk-endless"></div>`;
   }
 
   // ---------- pages ----------
@@ -149,7 +181,7 @@
         ${section('👑 Top Priced Models', '#/market/all?sort=high', grid(priciest.map(modelCard)))}
         ${ad()}
         ${section('💰 Under ₹1,800', '#/market/all?max=1800', grid(entry.map(modelCard)))}
-        ${ad('native')}
+        ${section(`⌚ All Watches <span class="muted">(${fmt(models.length)})</span>`, '#/market/all', endless('homeAll', models.slice().sort((x, y) => y[5] - x[5])))}
         ${sourceNote(idx.listings)}
         </div>`;
     });
@@ -253,7 +285,8 @@
   }
 
   function modelPage(bs, ms, q) {
-    return Promise.all([load(bs + '.json'), load(`l/${bs}/${ms}.json`)]).then(([b, d]) => {
+    return Promise.all([load(bs + '.json'), load(`l/${bs}/${ms}.json`), load('index.json')]).then(([b, d, idx]) => {
+      INDEX = idx;
       const m = b.models.find((x) => x.slug === ms);
       if (!m) throw new Error('Not found');
       const refFilter = q.ref != null && q.ref !== '' ? +q.ref : null;
@@ -303,9 +336,23 @@
           ${pager(page, pages, (n) => qlink(path, q, { page: n }))}
         </section>
         ${ad('native')}
+        ${moreWatches(bs, ms, b.brand)}
         ${sourceNote(m.listings)}
       </div>`;
     });
+  }
+
+  // Watch suggestions at the end of a model page, so visitors keep browsing.
+  function moreWatches(bs, ms, brand) {
+    const idx = INDEX;
+    if (!idx) return '';
+    const others = idx.models.filter((x) => !(x[0] === bs && x[1] === ms));
+    const same = others.filter((x) => x[0] === bs).sort((x, y) => y[5] - x[5]).slice(0, 8);
+    // "You may also like": other brands, in an order that changes per watch but is stable on reload.
+    const seed = price(bs, ms);
+    const rest = others.filter((x) => x[0] !== bs).sort((x, y) => ((price(x[0], x[1]) * seed) % 997) - ((price(y[0], y[1]) * seed) % 997));
+    return `${same.length ? `<section class="section"><div class="section-head"><h2>More from ${esc(brand)}</h2><a href="#/market/${bs}" class="link">View all →</a></div>${grid(same.map(modelCard))}</section>` : ''}
+      <section class="section"><div class="section-head"><h2>You may also like</h2><a href="#/market/all" class="link">All watches →</a></div>${endless('moreAll', rest)}</section>`;
   }
 
   // ---------- router hook (called from app.js) ----------
@@ -315,9 +362,11 @@
     const my = ++token;
     app.innerHTML = `<div class="container">${loading}</div>`;
     const page = () => parts.length === 0 ? home() : parts[0] === 'credits' ? creditsPage() : parts[0] === 'brands' ? brandsPage() : parts[0] === 'all' ? allModels(q) : parts.length === 1 ? brandPage(parts[0], q) : modelPage(parts[0], parts[1], q);
+    afterRender = null;
     photos().then(page).then((html) => {
       if (my !== token) return;
       app.innerHTML = html;
+      if (afterRender) afterRender();
       if (parts.length === 2 && (q.page || q.cond || q.ref || q.sort)) { const el = document.getElementById('mkListings'); if (el) el.scrollIntoView(); }
       Ads.render(app);
     }).catch(() => {

@@ -393,3 +393,7 @@ button, input, select, textarea { font: inherit; }
 .sponsored-card .sp-text { font-size: .85rem; color: #c7cfdb; }
 .ad-card:has(.sponsored-card) { padding: 26px 0 0; border-style: solid; background: #0f1b2d; }
 .ad-card:has(.sponsored-card) .ad-label { color: #c7cfdb; }
+
+/* endless lists */
+.mk-endless .grid + .grid { margin-top: 18px; }
+.mk-more { text-align: center; padding: 22px 0 6px; color: var(--muted); font-size: .9rem; }
