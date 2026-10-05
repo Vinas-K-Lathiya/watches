@@ -74,8 +74,7 @@
   }
   const priceBlock = (n) => `<div class="price-row"><span class="price">${rs(n)}</span></div>`;
 
-  // ---------- ads inside grids ----------
-  // Boxes 2, 6, 10, 14 ... (every 4th) are ad boxes the same size as a watch box,
+  // Box 2 of the first row is a Sponsored box the same size as a watch box,
   // and a full-width native ad row follows every 3 rows.
   const adCard = '<div class="card ad-card"><span class="ad-label">Sponsored</span><div data-ad="card"></div></div>';
   // Number of watch boxes per row on this screen (matches .grid in style.css: boxes at least 220px wide).
@@ -85,12 +84,10 @@
     if (w <= 560) return 2;
     return Math.max(1, Math.floor((content + 18) / (220 + 18)));
   }
-  function grid(cards) {
-    const out = [];
-    cards.forEach((c) => {
-      if (out.length % 4 === 1) out.push(adCard);
-      out.push(c);
-    });
+  // One Sponsored box, as the 2nd box of the first row only (noCard: none, e.g. for extra endless batches).
+  function grid(cards, noCard) {
+    const out = cards.slice();
+    if (!noCard && out.length > 1) out.splice(1, 0, adCard);
     // A full-width native ad row after every 3 rows of boxes.
     const perRows = gridColumns() * 3;
     let html = '';
@@ -115,7 +112,7 @@
       sentinel.className = 'mk-more';
       box.after(sentinel);
       const more = () => {
-        box.insertAdjacentHTML('beforeend', grid(models.slice(shown, shown + BATCH).map(modelCard)));
+        box.insertAdjacentHTML('beforeend', grid(models.slice(shown, shown + BATCH).map(modelCard), shown > 0));
         shown += BATCH;
         Ads.render(box);
         sentinel.textContent = `Showing ${Math.min(shown, models.length)} of ${models.length} – scroll for more`;
