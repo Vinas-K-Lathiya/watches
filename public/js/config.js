@@ -3,11 +3,9 @@
  * ============================================================ */
 window.STORE_CONFIG = {
   name: 'TimeVault',
-  tagline: 'Luxury watch price database',
+  tagline: 'Luxury watches with real photos',
   currency: '₹',
   locale: 'en-IN',
-  // Used to show rupee values for the US-dollar prices in Market Prices.
-  usdToInr: 88,
 
   // Shown on the Contact page.
   email: 'support@timevault.store',

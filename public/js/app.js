@@ -8,8 +8,8 @@
 
   function about() {
     return `<div class="container narrow prose"><h1>About ${esc(C.name)}</h1>
-      <p>${esc(C.name)} is a free luxury watch price database. It covers 1.3 lakh+ real listings of 212 models, each with a real photo, from Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Tudor and other luxury brands, with prices by model and reference number.</p>
-      <p>The data comes from the <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> by Philmore Koung, which collected asking prices from chrono24.com in July 2023. Prices are in US dollars with an approximate rupee value.</p>
+      <p>${esc(C.name)} is a free luxury watch website with real photos and details of 212 models from Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Tudor and other luxury brands, plus 1.3 lakh+ real listings.</p>
+      <p>Prices shown on this site are display prices between ₹1,500 and ₹2,500. They are not market prices and not offers – we do not sell watches. Model and listing details come from the <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> (chrono24.com, July 2023).</p>
       <div data-ad="728x90" class="ad-slot"></div></div>`;
   }
 
@@ -21,9 +21,9 @@
   }
 
   const PAGES = {
-    disclaimer: ['Disclaimer', `<p>${esc(C.name)} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by any watch brand, retailer or marketplace mentioned. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p>Prices are historical asking prices from public listings (July 2023), shown in US dollars with an approximate rupee conversion that excludes import duty and taxes. They are not offers and may differ from current prices.</p><p>Watch photos come from Wikimedia Commons under free licences (see Photo Credits). They show the model family and may not match every reference number, dial or year listed.</p>`],
+    disclaimer: ['Disclaimer', `<p>${esc(C.name)} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by any watch brand, retailer or marketplace mentioned. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p><strong>Prices on this site are display prices between ₹1,500 and ₹2,500 chosen by us. They are not the real market price of any watch, not offers, and must not be relied on.</strong> Real luxury watches from these brands usually cost far more.</p><p>Watch photos come from Wikimedia Commons under free licences (see Photo Credits). They show the model family and may not match every reference number, dial or year listed.</p>`],
     privacy: ['Privacy Policy', `<p>We do not require you to create an account and we do not collect personal information.</p><p><strong>Advertising:</strong> This website shows ads served by third-party networks such as Adsterra. These partners may use cookies or similar technologies to show relevant ads and measure performance. You can control cookies through your browser settings.</p><p>For any privacy questions, contact ${esc(C.email)}.</p>`],
-    terms: ['Terms of Use', '<p>By using this website you agree to these terms. All information is provided "as is" for general information only. We make no guarantee that prices or specifications are complete or current. We are not responsible for any purchase decision made based on this website.</p>'],
+    terms: ['Terms of Use', '<p>By using this website you agree to these terms. All information is provided "as is" for general information only. Prices shown are display prices, not market prices. We make no guarantee that specifications are complete or current. We are not responsible for any purchase decision made based on this website.</p>'],
   };
   function staticPage(slug) {
     const pg = PAGES[slug];
@@ -84,7 +84,7 @@
     const top = [['rolex', 'Rolex'], ['omega', 'Omega'], ['patek-philippe', 'Patek Philippe'], ['audemars-piguet', 'Audemars Piguet'], ['cartier', 'Cartier'], ['tag-heuer', 'TAG Heuer'], ['breitling', 'Breitling'], ['tudor', 'Tudor'], ['iwc', 'IWC']];
     $('#navLinks').innerHTML = '<a href="#/">Home</a><a href="#/market/all">All Models</a>' + top.map(([s, n]) => `<a href="#/market/${s}">${n}</a>`).join('') + '<a href="#/market/brands">All Brands</a>';
     $('#footerBrands').innerHTML = top.map(([s, n]) => `<li><a href="#/market/${s}">${n} Prices</a></li>`).join('');
-    $('#footerLinks').innerHTML = [['#/market/all?sort=popular', 'Most Listed Models'], ['#/market/all?sort=high', 'Most Expensive Watches'], ['#/market/all?max=5000', 'Luxury Under $5,000'], ['#/market/brands', 'All Brands'], ['#/market/credits', 'Photo Credits']].map(([h, n]) => `<li><a href="${h}">${n}</a></li>`).join('');
+    $('#footerLinks').innerHTML = [['#/market/all?sort=popular', 'Most Listed Models'], ['#/market/all?sort=high', 'Top Priced Watches'], ['#/market/all?max=1800', 'Watches Under ₹1,800'], ['#/market/brands', 'All Brands'], ['#/market/credits', 'Photo Credits']].map(([h, n]) => `<li><a href="${h}">${n}</a></li>`).join('');
     $('#menuBtn').addEventListener('click', () => document.body.classList.toggle('menu-open'));
     window.addEventListener('hashchange', route);
     route();

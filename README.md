@@ -1,6 +1,6 @@
 # TimeVault – Luxury Watch Price Database
 
-A luxury watch price website that earns money from **Adsterra ads**. It is built on the [Luxury Watch Listings dataset](https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings) by Philmore Koung: 284,491 asking-price listings scraped from chrono24.com in July 2023. After removing exact duplicates the site has **272,918 listings** of **1,000 models** and 39,000+ reference numbers from 29 brands (Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Richard Mille, ...). Prices are in US dollars with an approximate rupee value (`usdToInr` in `config.js`).
+A luxury watch price website that earns money from **Adsterra ads**. It is built on the [Luxury Watch Listings dataset](https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings) by Philmore Koung: 284,491 asking-price listings scraped from chrono24.com in July 2023. After removing exact duplicates the site has **272,918 listings** of **1,000 models** and 39,000+ reference numbers from 29 brands (Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Richard Mille, ...). **Prices shown on the site are display prices**: every model gets a fixed pseudo-random price between ₹1,500 and ₹2,500 (`price()` in `public/js/market.js`, range set by `PRICE_MIN`/`PRICE_MAX`). The site labels them as display prices, not market prices.
 
 Only models that have a real photo are kept: after the photo steps, `scripts/prune-no-photo.py` removes the others. The live site has **212 models, 134,130 listings and 15 brands**.
 
@@ -77,7 +77,6 @@ To publish changes later, just run `firebase deploy --only hosting` again.
 Edit `public/js/config.js`:
 
 - `name`, `tagline`: your site name
-- `usdToInr`: rate used for the rupee values
 - `email`: shown on the Contact page
 
 ## 3. Add Adsterra ads
