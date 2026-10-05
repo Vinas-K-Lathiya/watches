@@ -19,7 +19,7 @@
   function banner(el, size) {
     const [w, h] = SIZES[size];
     const u = unit(size);
-    if (!u.key) return placeholder(el, `Adsterra ${size}`, w, h);
+    if (!u.key) return cfg.smartlink ? sponsoredStrip(el, w) : placeholder(el, `Adsterra ${size}`, w, h);
     const domain = (u.domain || 'www.highrevenueformat.com').replace(/^https?:\/\//, '').replace(/\/$/, '');
     const html = `<!doctype html><html><head><style>html,body{margin:0;padding:0;overflow:hidden;background:transparent}</style></head><body>
 <script type="text/javascript">atOptions={'key':'${u.key}','format':'iframe','height':${h},'width':${w},'params':{}};<\/script>
@@ -105,10 +105,10 @@
       if (width >= 480 && unit('468x60').key) return '468x60';
       if (unit('320x50').key) return '320x50';
       if (unit('300x250').key) return '300x250';
-      return width >= 740 ? '728x90' : '320x50';
+      return width >= 740 ? '728x90' : '320x50'; // switched off -> Sponsored strip
     }
     // Side rails are only visible on very wide screens (see .ad-rail in style.css); never load hidden ads.
-    if ((wanted === '160x600' || wanted === '160x300') && window.innerWidth < 1660) return null;
+    if ((wanted === '160x600' || wanted === '160x300') && window.innerWidth < 1366) return null;
     return wanted;
   }
 
@@ -122,6 +122,12 @@
     a.rel = 'sponsored nofollow noopener';
     a.innerHTML = '<span class="sp-icon">✨</span><strong>Today\'s featured offer</strong><span class="sp-text">Tap to see a sponsored offer picked for you</span><span class="btn btn-gold btn-sm">Open offer</span>';
     el.replaceWith(a);
+  }
+
+  // A labelled Sponsored strip (Smartlink) used where a banner is switched off.
+  function sponsoredStrip(el, w) {
+    el.innerHTML = `<a class="sponsored-strip${w <= 300 ? ' tall' : ''}" href="${cfg.smartlink}" target="_blank" rel="sponsored nofollow noopener">
+      <span class="sp-tag">Sponsored</span><span class="sp-main">✨ <strong>Today's featured offer</strong> – tap to see a deal picked for you</span><span class="btn btn-gold btn-sm">Open offer</span></a>`;
   }
 
   // Smartlink: a clearly labelled "Sponsored" link (see config.js).
@@ -139,7 +145,6 @@
       if (type === 'native') return native(el);
       if (type === 'card') {
         // Ad box inside a grid of watch boxes: banner if switched on, otherwise a Sponsored (Smartlink) box.
-        if (unit('160x300').key) return banner(el, '160x300');
         return sponsoredCard(el);
       }
       const size = fitSize(el, type);

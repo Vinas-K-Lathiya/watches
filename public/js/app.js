@@ -10,14 +10,14 @@
     return `<div class="container narrow prose"><h1>About ${esc(C.name)}</h1>
       <p>${esc(C.name)} is a free luxury watch website with real photos and details of 212 models from Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Tudor and other luxury brands, plus 1.3 lakh+ real listings.</p>
       <p>Prices shown on this site are display prices between ₹1,500 and ₹2,499. They are not market prices and not offers – we do not sell watches. Model and listing details come from the <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> (chrono24.com, July 2023).</p>
-      <div data-ad="728x90" class="ad-slot"></div></div>`;
+      <div data-ad="728x90" class="ad-slot"></div><div data-ad="native" class="ad-slot"></div></div>`;
   }
 
   function contact() {
     return `<div class="container narrow prose"><h1>Contact Us</h1>
       <p>Questions or feedback? Let us know.</p>
       <ul class="contact-list"><li>✉️ Email: <a class="link" href="mailto:${esc(C.email)}">${esc(C.email)}</a></li></ul>
-      <div data-ad="300x250" class="ad-slot"></div></div>`;
+      <div data-ad="300x250" class="ad-slot"></div><div data-ad="native" class="ad-slot"></div></div>`;
   }
 
   const PAGES = {
@@ -28,7 +28,7 @@
   function staticPage(slug) {
     const pg = PAGES[slug];
     if (!pg) return notFound();
-    return `<div class="container narrow prose"><h1>${pg[0]}</h1>${pg[1]}<div data-ad="728x90" class="ad-slot"></div></div>`;
+    return `<div class="container narrow prose"><h1>${pg[0]}</h1>${pg[1]}<div data-ad="728x90" class="ad-slot"></div><div data-ad="native" class="ad-slot"></div></div>`;
   }
   function notFound() {
     return `<div class="container narrow empty"><h1>Page not found</h1><a href="#/" class="btn">Go home</a></div>`;

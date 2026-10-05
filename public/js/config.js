@@ -27,14 +27,14 @@ window.STORE_CONFIG = {
   ads: {
     enabled: true,
     // Adsterra site ID 6100502 (timevault-watches-2026.web.app)
-    // Banners are switched off (on: false) because they earned $0 in the first stats;
-    // set on: true to bring any of them back.
+    // Banners with on: false earned $0 in the first stats; their spaces show a Sponsored
+    // (Smartlink) strip instead. 160x600 and 160x300 are on for the left/right side ads.
     banner728x90:  { key: '3e687ac39152da63f0601b32c2e6de32', domain: 'www.highrevenueformat.com' , on: false },
     banner468x60:  { key: 'd7bd6e43a949debcbcf7249b7c8daa9e', domain: 'www.highrevenueformat.com' , on: false },
     banner300x250: { key: '2744f438d42941804d4b06d34c9ff895', domain: 'www.highrevenueformat.com' , on: false },
     banner320x50:  { key: '6bf5980dc1d4050b0ffe58fe5be03cde', domain: 'www.highrevenueformat.com' , on: false },
-    banner160x600: { key: 'de3145bbb1ff4088b0ec01c7c8ce64ff', domain: 'www.highrevenueformat.com' , on: false },
-    banner160x300: { key: 'f49b08defd9cd089dfb328248ffc1284', domain: 'www.highrevenueformat.com' , on: false },
+    banner160x600: { key: 'de3145bbb1ff4088b0ec01c7c8ce64ff', domain: 'www.highrevenueformat.com' , on: true },
+    banner160x300: { key: 'f49b08defd9cd089dfb328248ffc1284', domain: 'www.highrevenueformat.com' , on: true },
     native:    { src: 'https://pl31674026.profitableratecpmnetwork.com/3216abf5619760219f4f2e335aeb29d7/invoke.js', containerId: 'container-3216abf5619760219f4f2e335aeb29d7' },
     socialBar: { src: 'https://pl31674024.profitableratecpmnetwork.com/95/c3/cb/95c3cba7d19eff892e27343f1c7b5bcc.js' },
     popunder:  { src: 'https://pl31674023.profitableratecpmnetwork.com/cb/bb/1e/cbbb1e41cd113e0dd8a534f0e6c06947.js' },

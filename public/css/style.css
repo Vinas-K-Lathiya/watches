@@ -368,7 +368,14 @@ button, input, select, textarea { font: inherit; }
 .ad-rail { position: fixed; top: 170px; width: 160px; z-index: 5; display: none; }
 .ad-rail-l { left: calc(50% - 640px - 180px); }
 .ad-rail-r { right: calc(50% - 640px - 180px); }
-@media (min-width: 1660px) { .ad-rail { display: block; } }
+/* Side ads from 1366px wide: the page content gets narrower to make room on both sides. */
+@media (min-width: 1366px) {
+  .ad-rail { display: block; }
+  .ad-rail-l { left: 16px; }
+  .ad-rail-r { right: 16px; }
+  .header .container, #app .container, .footer .container { max-width: calc(100vw - 2 * 196px); }
+}
+@media (min-width: 1700px) { .ad-rail-l { left: calc(50% - 640px - 180px); } .ad-rail-r { right: calc(50% - 640px - 180px); } .header .container, #app .container, .footer .container { max-width: 1280px; } }
 
 /* ad boxes inside grids (same size as a watch box) */
 .ad-card { align-items: center; justify-content: center; min-height: 340px; padding: 26px 8px 12px; background: #fbfaf6; border: 1px dashed #e4dfd2; box-shadow: none; position: relative; }
@@ -397,3 +404,11 @@ button, input, select, textarea { font: inherit; }
 /* endless lists */
 .mk-endless .grid + .grid { margin-top: 18px; }
 .mk-more { text-align: center; padding: 22px 0 6px; color: var(--muted); font-size: .9rem; }
+
+/* Sponsored strip (Smartlink) in place of switched-off banners */
+.sponsored-strip { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 728px; margin: 0 auto; padding: 14px 18px; border-radius: 12px; background: linear-gradient(120deg, #0f1b2d, #24395c); color: #fff; }
+.sponsored-strip .sp-tag { font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: #c7cfdb; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.sponsored-strip .sp-main { flex: 1; font-size: .92rem; color: #e3e8f0; }
+.sponsored-strip strong { color: var(--gold-2); }
+.sponsored-strip.tall { flex-direction: column; text-align: center; max-width: 300px; padding: 22px 16px; }
+@media (max-width: 560px) { .sponsored-strip { flex-wrap: wrap; } .sponsored-strip .sp-main { flex-basis: 100%; order: 2; } .sponsored-strip .btn { order: 3; } }
