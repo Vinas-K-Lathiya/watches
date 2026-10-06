@@ -8,7 +8,7 @@ window.STORE_CONFIG = {
   locale: 'en-IN',
 
   // Shown on the Contact page.
-  email: 'support@timevault.store',
+  email: 'vlathiya5944@gmail.com',
 
   /* ----------------------------------------------------------
    *  ADSTERRA ADS
