@@ -22,7 +22,7 @@
 
   const PAGES = {
     disclaimer: ['Disclaimer', `<p>${esc(C.name)} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by any watch brand, retailer or marketplace mentioned. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p><strong>Prices on this site are display prices between ₹1,500 and ₹2,499 chosen by us. They are not the real market price of any watch, not offers, and must not be relied on.</strong> Real luxury watches from these brands usually cost far more.</p><p>Watch photos come from Wikimedia Commons under free licences (see Photo Credits). They show the model family and may not match every reference number, dial or year listed.</p>`],
-    privacy: ['Privacy Policy', `<p>We do not require you to create an account and we do not collect personal information.</p><p><strong>Advertising:</strong> This website shows ads served by third-party networks such as Adsterra. These partners may use cookies or similar technologies to show relevant ads and measure performance. You can control cookies through your browser settings.</p><p>For any privacy questions, contact ${esc(C.email)}.</p>`],
+    privacy: ['Privacy Policy', `<p>We do not require you to create an account and we do not collect personal information.</p><p><strong>Analytics:</strong> We use Google Analytics to count visits and see which pages are popular. It uses cookies and collects information such as pages viewed, device type and approximate location. It does not tell us who you are.</p><p><strong>Advertising:</strong> This website shows ads served by third-party networks such as Adsterra. These partners may use cookies or similar technologies to show relevant ads and measure performance. You can control cookies through your browser settings.</p><p>For any privacy questions, contact ${esc(C.email)}.</p>`],
     terms: ['Terms of Use', '<p>By using this website you agree to these terms. All information is provided "as is" for general information only. Prices shown are display prices, not market prices. We make no guarantee that specifications are complete or current. We are not responsible for any purchase decision made based on this website.</p>'],
   };
   function staticPage(slug) {
@@ -32,6 +32,13 @@
   }
   function notFound() {
     return `<div class="container narrow empty"><h1>Page not found</h1><a href="#/" class="btn">Go home</a></div>`;
+  }
+
+  // Google Analytics: pages use #/ addresses, so each page change is sent as its own page view
+  // (for example #/market/rolex is reported as /market/rolex).
+  function pageView(path) {
+    if (typeof window.gtag !== 'function') return;
+    window.gtag('event', 'page_view', { page_location: location.origin + path, page_path: path, page_title: document.title });
   }
 
   // ---------- router ----------
@@ -52,6 +59,7 @@
     if (parts[0] === undefined || parts[0] === 'market') {
       document.title = `${C.name} – ${C.tagline}`;
       Market.render(app, parts.slice(1), qs);
+      pageView(hash);
       return;
     }
     let html;
@@ -66,6 +74,7 @@
     document.title = `${C.name} – ${C.tagline}`;
     app.innerHTML = html;
     Ads.render(document);
+    pageView(hash);
   }
 
   document.addEventListener('submit', (e) => {
