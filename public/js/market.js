@@ -171,7 +171,7 @@
             <span class="eyebrow">Luxury Watch Database</span>
             <h1>Luxury watches,<br>real photos.</h1>
             <p>Photos, details and ${fmt(idx.listings)} real listings of ${fmt(idx.models.length)} models from ${brands.length} luxury brands – Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Tudor and more.</p>
-            <form class="mk-search" data-mk-search><input name="q" type="search" placeholder="Search a model, e.g. Submariner, Nautilus, Royal Oak…" aria-label="Search models"><button class="btn btn-gold">Search</button></form>
+            <form class="mk-search" data-mk-search><input name="q" type="search" placeholder="Search a model, e.g. Submariner, Aquanaut, Royal Oak…" aria-label="Search models"><button class="btn btn-gold">Search</button></form>
             <div class="hero-trust"><span>✔ ${fmt(idx.listings)} listings</span><span>✔ Real photos</span><span>✔ Display prices ₹1,500–₹2,499</span></div>
           </div>
           <div class="hero-stats">

@@ -8,7 +8,7 @@ window.STORE_CONFIG = {
   locale: 'en-US',
 
   // Shown on the Contact page.
-  email: 'support@watchpriceguide.com',
+  email: 'vlathiya5944@gmail.com',
 
   /* ----------------------------------------------------------
    *  ADSTERRA ADS

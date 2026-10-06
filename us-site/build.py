@@ -24,7 +24,8 @@ OUT = HERE / 'dist'
 NAME = 'WatchPriceGuide'
 BASE_URL = 'https://watchpriceguide-us.web.app'
 TAGLINE = 'Luxury watch reference numbers, specs and real photos'
-EMAIL = 'support@watchpriceguide.com'
+EMAIL = 'vlathiya5944@gmail.com'
+GA_ID = 'G-WB6MX0J4JW'   # Google Analytics
 
 # Same "random" pattern as TimeVault (1500, 1599 ... 2499), in dollars.
 PRICES = [1500, 1599, 1699, 1799, 1899, 1999, 2099, 2199, 2299, 2399, 2499]
@@ -90,6 +91,8 @@ def page(path, title, description, body, crumbs=None):
   <meta property="og:type" content="website">
   <meta property="og:url" content="{canonical}">
   <meta property="og:site_name" content="{NAME}">
+  <script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
+  <script>window.dataLayer = window.dataLayer || []; function gtag(){{dataLayer.push(arguments);}} gtag('js', new Date()); gtag('config', '{GA_ID}');</script>
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,7 +106,7 @@ def page(path, title, description, body, crumbs=None):
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
       <a href="/" class="logo"><span class="logo-mark">⌚</span><span>{NAME}</span></a>
       <form class="search" action="/search" method="get" role="search">
-        <input name="q" type="search" placeholder="Search Submariner, Nautilus, Royal Oak…" aria-label="Search watches">
+        <input name="q" type="search" placeholder="Search Submariner, Aquanaut, Royal Oak…" aria-label="Search watches">
         <button type="submit" aria-label="Search">🔍</button>
       </form>
     </div>
@@ -136,8 +139,9 @@ def page(path, title, description, body, crumbs=None):
 
 
 def write(path, text):
-    """/rolex/daytona -> dist/rolex/daytona.html (Firebase serves it without .html)."""
-    f = OUT / ('index.html' if path == '/' else path.strip('/') + '.html')
+    """/rolex/daytona -> dist/rolex/daytona/index.html, served at /rolex/daytona.
+    (Folders, not cleanUrls, so Google's .html verification file is not redirected.)"""
+    f = OUT / ('404.html' if path == '/404' else (path.strip('/') + '/index.html').lstrip('/'))
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(text)
     if path != '/404':
@@ -199,7 +203,7 @@ def home():
         <span class="eyebrow">Luxury Watch Guide</span>
         <h1>Luxury watches,<br>real photos.</h1>
         <p>Reference numbers, specs and {fmt(total)} real listings of {len(MODELS)} models from {len(brands)} luxury brands – Rolex, Patek Philippe, Audemars Piguet, Omega, Cartier, Tudor and more.</p>
-        <form class="mk-search" action="/search" method="get"><input name="q" type="search" placeholder="Search a model, e.g. Submariner, Nautilus, Royal Oak…" aria-label="Search models"><button class="btn btn-gold">Search</button></form>
+        <form class="mk-search" action="/search" method="get"><input name="q" type="search" placeholder="Search a model, e.g. Submariner, Aquanaut, Royal Oak…" aria-label="Search models"><button class="btn btn-gold">Search</button></form>
         <div class="hero-trust"><span>✔ {fmt(total)} listings</span><span>✔ Real photos</span><span>✔ Reference numbers</span></div>
       </div>
       <div class="hero-stats">
@@ -339,7 +343,7 @@ INFO = {
     'about': ('About Us', f'<p>{NAME} is a free luxury watch guide with real photos, reference numbers and specs of {{models}} models from Rolex, Omega, Patek Philippe, Audemars Piguet, Cartier, Tudor and other luxury brands, plus real listings.</p><p>Prices shown on this site are display prices between $15 and $24.99. They are not market prices and not offers – we do not sell watches. Model and listing details come from the <a class="link" href="{DATASET}" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> (chrono24.com, July 2023).</p>'),
     'contact': ('Contact Us', f'<p>Questions or feedback? Let us know.</p><ul class="contact-list"><li>✉️ Email: <a class="link" href="mailto:{EMAIL}">{EMAIL}</a></li></ul>'),
     'disclaimer': ('Disclaimer', f'<p>{NAME} is an independent information website. We do not sell watches and are not affiliated with, endorsed by or sponsored by any watch brand, retailer or marketplace mentioned. All brand names and trademarks belong to their respective owners and are used only to identify the products.</p><p><strong>Prices on this site are display prices between $15 and $24.99 chosen by us. They are not the real market price of any watch, not offers, and must not be relied on.</strong> Real luxury watches from these brands usually cost far more.</p><p>Watch photos come from Wikimedia Commons under free licences (see <a class="link" href="/credits">Photo Credits</a>). They show the model family and may not match every reference number, dial or year listed.</p>'),
-    'privacy': ('Privacy Policy', f'<p>We do not require you to create an account and we do not collect personal information.</p><p><strong>Advertising:</strong> This website shows ads served by third-party networks such as Adsterra. These partners may use cookies or similar technologies to show relevant ads and measure performance. You can control cookies through your browser settings.</p><p>For any privacy questions, contact {EMAIL}.</p>'),
+    'privacy': ('Privacy Policy', f'<p>We do not require you to create an account and we do not collect personal information.</p><p><strong>Analytics:</strong> We use Google Analytics to count visits and see which pages are popular. It uses cookies and collects information such as pages viewed, device type and approximate location. It does not tell us who you are.</p><p><strong>Advertising:</strong> This website shows ads served by third-party networks such as Adsterra. These partners may use cookies or similar technologies to show relevant ads and measure performance. You can control cookies through your browser settings.</p><p>For any privacy questions, contact {EMAIL}.</p>'),
     'terms': ('Terms of Use', '<p>By using this website you agree to these terms. All information is provided "as is" for general information only. Prices shown are display prices, not market prices. We make no guarantee that specifications are complete or current. We are not responsible for any purchase decision made based on this website.</p>'),
 }
 
