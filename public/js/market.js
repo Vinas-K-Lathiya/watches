@@ -63,6 +63,8 @@
 
   // ---------- shared bits ----------
   const ad = (t) => `<div data-ad="${t || '728x90'}" class="ad-slot"></div>`;
+  // Ad above the first row of watches: not shown on phones, so the watches come first there.
+  const adTop = (t) => `<div data-ad="${t || '728x90'}" data-desktop-only class="ad-slot"></div>`;
   const loading = '<div class="mk-loading">Loading market data…</div>';
   const sourceNote = (n) => `<p class="small muted mk-source">Prices on this site are display prices between ₹1,500 and ₹2,499 set by ${esc(C.name)}; they are not market prices or offers. Model and listing details: <a class="link" href="https://www.kaggle.com/datasets/philmorekoung11/luxury-watch-listings" target="_blank" rel="noopener">Luxury Watch Listings dataset</a> by Philmore Koung${n ? ` (${fmt(n)} listings from chrono24.com, July 2023)` : ''}.</p>`;
   function parseQuery(q) { const o = {}; new URLSearchParams(q || '').forEach((v, k) => { o[k] = v; }); return o; }
@@ -82,9 +84,6 @@
   }
   const priceBlock = (n) => `<div class="price-row"><span class="price">${rs(n)}</span></div>`;
 
-  // Box 2 of the first row is a Sponsored box the same size as a watch box,
-  // and a full-width native ad row follows every 3 rows.
-  const adCard = '<div class="card ad-card"><span class="ad-label">Sponsored</span><div data-ad="card"></div></div>';
   // Number of watch boxes per row on this screen (matches .grid in style.css: boxes at least 220px wide).
   function gridColumns() {
     const w = window.innerWidth;
@@ -92,10 +91,9 @@
     if (w <= 560) return 2;
     return Math.max(1, Math.floor((content + 18) / (220 + 18)));
   }
-  // One Sponsored box, as the 2nd box of the first row only (noCard: none, e.g. for extra endless batches).
-  function grid(cards, noCard) {
-    const out = cards.slice();
-    if (!noCard && out.length > 1) out.splice(1, 0, adCard);
+  // A full-width native ad row follows every 3 rows of watch boxes.
+  function grid(cards) {
+    const out = cards;
     // A full-width native ad row after every 3 rows of boxes.
     const perRows = gridColumns() * 3;
     let html = '';
@@ -120,7 +118,7 @@
       sentinel.className = 'mk-more';
       box.after(sentinel);
       const more = () => {
-        box.insertAdjacentHTML('beforeend', grid(models.slice(shown, shown + BATCH).map(modelCard), shown > 0));
+        box.insertAdjacentHTML('beforeend', grid(models.slice(shown, shown + BATCH).map(modelCard)));
         shown += BATCH;
         Ads.render(box);
         sentinel.textContent = `Showing ${Math.min(shown, models.length)} of ${models.length} – scroll for more`;
@@ -184,7 +182,7 @@
           </div>
         </div></section>
         <div class="container">
-        ${ad()}
+        ${adTop()}
         ${section('Browse by Brand', '#/market/brands', grid(brands.slice(0, 10).map(brandCard)))}
         <div class="native-row native-slot" data-ad="native-frame"></div>
         ${section(`⌚ All Watches <span class="muted">(${fmt(models.length)})</span>`, '', `<div id="homeAll">${grid(models.slice().sort((x, y) => y[5] - x[5]).map(modelCard))}</div>`)}
@@ -215,7 +213,7 @@
       return `<div class="container">
         <div class="crumbs"><a href="#/">Home</a> / <span>All Brands</span></div>
         <h1>All Watch Brands <span class="muted">(${main.length})</span></h1>
-        ${ad()}
+        ${adTop()}
         ${grid(withFrom(idx, main).map(brandCard))}
         ${others.length ? `<p class="small muted" style="margin-top:14px">Also in the data, with only a few listings: ${others.map((b) => `<a class="link" href="#/market/${b.slug}">${esc(b.brand)}</a>`).join(', ')}.</p>` : ''}
         ${ad('native')}
@@ -247,7 +245,7 @@
         <form class="mk-search" data-mk-filter><input name="q" type="search" placeholder="Search models…" value="${esc(q.q || '')}"><button class="btn btn-sm">Search</button></form>
         <div class="chips">${BANDS.map(([l, lo, hi]) => { const on = band && band[0] === l; return `<a class="chip chip-sm${on ? ' active' : ''}" href="${qlink('/all', q, on ? { min: '', max: '', page: '' } : { min: lo, max: hi, page: '' })}">${l}</a>`; }).join('')}</div>
         <div class="chips" style="margin-top:8px">${brands.map((b) => `<a class="chip chip-sm${q.brand === b.slug ? ' active' : ''}" href="${qlink('/all', q, { brand: q.brand === b.slug ? '' : b.slug, page: '' })}">${esc(b.brand)}</a>`).join('')}</div>
-        ${ad('native')}
+        ${adTop('native')}
         ${view.length ? cards : `<div class="empty"><p class="muted">No models found.</p><a class="btn" href="#/market/all">Show all models</a></div>`}
         ${pager(page, pages, (n) => qlink('/all', q, { page: n }))}
         ${ad()}
@@ -281,7 +279,7 @@
           <div><span>Highest price</span><strong>${rs(Math.max(...b.models.map((m) => m.med)))}</strong></div>
         </div>
         <form class="mk-search" data-mk-filter><input name="q" type="search" placeholder="Filter ${esc(b.brand)} models or reference numbers…" value="${esc(q.q || '')}"><button class="btn btn-sm">Filter</button></form>
-        ${ad('native')}
+        ${adTop('native')}
         ${list.length ? cards : '<div class="empty"><p class="muted">No models match.</p></div>'}
         ${pager(page, pages, (n) => qlink('/' + bs, q, { page: n }))}
         ${ad()}

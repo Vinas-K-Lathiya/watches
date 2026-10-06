@@ -116,18 +116,6 @@
     return wanted;
   }
 
-  function sponsoredCard(el) {
-    const box = el.closest('.ad-card');
-    if (!cfg.smartlink) { (box || el).remove(); return; }
-    const a = document.createElement('a');
-    a.className = 'sponsored-card';
-    a.href = cfg.smartlink;
-    a.target = '_blank';
-    a.rel = 'sponsored nofollow noopener';
-    a.innerHTML = '<span class="sp-icon">✨</span><strong>Today\'s featured offer</strong><span class="sp-text">Tap to see a sponsored offer picked for you</span><span class="btn btn-gold btn-sm">Open offer</span>';
-    el.replaceWith(a);
-  }
-
   // Adsterra's native banner fills one fixed container id, so it works only once per page.
   // For repeated native rows, each one is loaded in its own small frame and the frame
   // grows to fit the ad.
@@ -186,13 +174,11 @@
     if (!cfg.enabled) { (root || document).querySelectorAll('[data-ad]').forEach((el) => el.remove()); return; }
     (root || document).querySelectorAll('[data-ad]:not([data-ad-done])').forEach((el) => {
       el.setAttribute('data-ad-done', '1');
+      // Ads above the first row of watches are skipped on phones.
+      if (el.hasAttribute('data-desktop-only') && window.innerWidth < 768) return el.remove();
       const type = el.getAttribute('data-ad');
       if (type === 'native') return native(el);
       if (type === 'native-frame') return nativeFrame(el);
-      if (type === 'card') {
-        // Ad box inside a grid of watch boxes: banner if switched on, otherwise a Sponsored (Smartlink) box.
-        return sponsoredCard(el);
-      }
       const size = fitSize(el, type);
       if (!size) return el.remove();
       banner(el, size);
