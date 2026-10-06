@@ -96,3 +96,17 @@ Ad slots are on the home page (several), the model lists (top, inside the grid e
 ```bash
 npm start        # opens http://localhost:5000
 ```
+
+## WatchPriceGuide (second website, US)
+
+`us-site/` builds a second, US-focused website from the same data and photos:
+https://watchpriceguide-us.web.app (Firebase Hosting site `watchpriceguide-us` in the same project).
+
+- Every page is plain HTML with its own address (`/rolex`, `/rolex/daytona`), plus
+  `sitemap.xml` and `robots.txt`, so Google can read every page.
+- Display prices in US dollars: $15, $15.99, $16.99 … $24.99, picked from each watch's
+  name (same pattern as TimeVault). Not market prices; every page says so.
+- Same Adsterra codes as TimeVault (`us-site/static/js/config.js`); `ads.js` and
+  `style.css` are copied from `public/` when the site is built.
+- Build: `python3 us-site/build.py` (writes `us-site/dist/`, not committed).
+  Deploy: `cd us-site && firebase deploy --only hosting` (runs the build first).

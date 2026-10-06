@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "site": "watchpriceguide-us",
+    "public": "dist",
+    "predeploy": ["python3 \"$PROJECT_DIR\"/build.py"],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "headers": [
+      { "source": "**/*.@(js|css|json|html|xml|txt)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+      { "source": "**/*.@(svg|jpg|jpeg|png|webp)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }] }
+    ]
+  }
+}
