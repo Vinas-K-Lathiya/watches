@@ -114,3 +114,14 @@ https://watchpriceguide-us.web.app (Firebase Hosting site `watchpriceguide-us` i
   `style.css` are copied from `public/` when the site is built.
 - Build: `python3 us-site/build.py` (writes `us-site/dist/`, not committed).
   Deploy: `cd us-site && firebase deploy --only hosting` (runs the build first).
+
+## Daily social media posts
+
+`social/post.py` posts one watch a day (406 different posts: each model and its top
+reference numbers) to Facebook, Instagram, Pinterest and X, with a link to its
+WatchPriceGuide page and the photo credit. `.github/workflows/social-post.yml` runs it
+every day at 15:07 UTC. A platform is used only when its GitHub secrets are set (see the
+top of `post.py`). Run the workflow by hand with "dry run" to preview a post.
+
+`social/make-images.py` makes the square 1080×1080 photos it posts
+(`us-site/static/social/`, published at `/social/<brand>/<model>.jpg`).
