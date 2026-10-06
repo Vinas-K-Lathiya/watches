@@ -1,0 +1,7 @@
+/* WatchPriceGuide extras (on top of the shared style.css) */
+.faq { background: #fff; border: 1px solid var(--line, #e5e7eb); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq p { margin: 8px 0 0; color: #374151; }
+.az-list { columns: 3 220px; column-gap: 24px; padding-left: 18px; margin: 0; }
+.az-list li { margin: 4px 0; break-inside: avoid; }
+.card-brand a.link { color: inherit; }

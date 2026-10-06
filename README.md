@@ -103,7 +103,11 @@ npm start        # opens http://localhost:5000
 https://watchpriceguide-us.web.app (Firebase Hosting site `watchpriceguide-us` in the same project).
 
 - Every page is plain HTML with its own address (`/rolex`, `/rolex/daytona`), plus
-  `sitemap.xml` and `robots.txt`, so Google can read every page.
+  `sitemap.xml` (with photos) and `robots.txt`, so Google can read every page.
+- Reference number pages (`/rolex/daytona/116520`) for every reference with 20+ listings:
+  specs, condition and year breakdown, newest listings.
+- SEO: page titles and descriptions, canonical links, Open Graph image, breadcrumbs and
+  FAQ data (schema.org), FAQ sections and an A–Z model list on brand pages.
 - Display prices in US dollars: $15, $15.99, $16.99 … $24.99, picked from each watch's
   name (same pattern as TimeVault). Not market prices; every page says so.
 - Same Adsterra codes as TimeVault (`us-site/static/js/config.js`); `ads.js` and
